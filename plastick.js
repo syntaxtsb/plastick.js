@@ -1,17 +1,16 @@
-/*globals window, document*/
+/*jslint browser:true*/
+/*globals define*/
 
 (function () {
 
     'use strict';
 
-    // performance.now() shim -------------------------------------------------
+    // performance.now() shim --------------------------------------------------
 
     (function () {
 
         window.performance = window.performance || {};
-
         if (!window.performance.now) {
-
             var nowOffset = Date.now();
             window.performance.now = function now() {
                 return Date.now() - nowOffset;
@@ -19,7 +18,24 @@
         }
     }());
 
-    // Plastick ----------------------------------------------------------------
+    // page focus shims --------------------------------------------------------
+
+    var hidden, visibilityChange;
+    if (document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support
+        hidden = 'hidden';
+        visibilityChange = 'visibilitychange';
+    } else if (document.mozHidden !== 'undefined') {
+        hidden = 'mozHidden';
+        visibilityChange = 'mozvisibilitychange';
+    } else if (document.msHidden !== 'undefined') {
+        hidden = 'msHidden';
+        visibilityChange = 'msvisibilitychange';
+    } else if (document.webkitHidden !== 'undefined') {
+        hidden = 'webkitHidden';
+        visibilityChange = 'webkitvisibilitychange';
+    }
+
+    // Plastick ////////////////////////////////////////////////////////////////
 
     /**
      * Creates a new Plastick object
@@ -28,7 +44,7 @@
      *
      * @property {Object} stage Reference to the Facade object linked to this Plastick.
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
-     * @property {Integer} gameTick Current unit of game time.
+     * @property {Integer} currentTick Current unit of game time.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @param {Object} stage The Facade object that will handle drawing this Plastick object.
      * @return {Object} New Plastick object.
@@ -37,22 +53,23 @@
 
     function Plastick(stage) {
 
-        this.GAME_TICK_SPEED = 10; // ms per tick
+        this.GAME_TARGET_TPS = 60; // target game ticks per second
         this.GAME_TICK_CHOKE = 50; // max # of ticks per canvas frame
 
         this.stage = stage;
         this.states = [];
         this.startTime = null;
-        this.freezeStart = null;
-        this.gameTick = 0;
+        this.currentTick = 0;
         this.tickTime = 0;
-        this.lastTickTime = 0;
-        this.frameTime = 0;
-        this.freezeTime = 0;
         this.isRunning = false;
         this.freezeOnBlur = true;
 
-        window.addEventListener('blur', this.freeze.bind(this));
+        this._freezeStart = null;
+        this._frameTime = 0;
+        this._freezeLength = 0;
+
+        document.addEventListener(visibilityChange, this._freeze.bind(this));
+
     }
 
     Plastick.prototype.currentState = function () {
@@ -60,93 +77,79 @@
         return this.states[this.states.length - 1];
     };
 
-    Plastick.prototype.validateState = function (state) {
-
-        if (!state.validated) {
-            // make sure state has all the necessary methods
-            if (typeof state.init !== 'function') {
-                state.init = function () { return undefined; };
-            }
-            if (typeof state.cleanup !== 'function') {
-                state.cleanup = function () { return undefined; };
-            }
-            if (typeof state.update !== 'function') {
-                state.update = function () { return undefined; };
-            }
-            if (typeof state.draw !== 'function') {
-                state.draw = function () { return undefined; };
-            }
-            if (typeof state.pause !== 'function') {
-                state.pause = function () { return undefined; };
-            }
-            if (typeof state.resume !== 'function') {
-                state.resume = function () { return undefined; };
-            }
-            if (typeof state.keyPressDown !== 'function') {
-                state.keyPressDown = function () { return undefined; };
-            }
-            if (typeof state.keyPressUp !== 'function') {
-                state.keyPressUp = function () { return undefined; };
-            }
-            state.validated = true;
-        }
-    };
-
     Plastick.prototype.pushState = function (state) {
 
         var s = this.currentState();
+
         if (s) {
-            s.pause();
+            s._pause(this);
+            this._destroyEventListeners(s);
         }
-        this.validateState(state);
-        this.states.push(state);
-        state.init();
+        if (state instanceof Plastick.State) {
+            this.states.push(state);
+            state._init(this);
+            this._createEventListeners(state);
+            return true;
+        } else {
+            return false;
+        }
     };
 
     Plastick.prototype.popState = function () {
 
         var s = this.states.pop();
+
         if (s) {
-            s.cleanup();
+            s._cleanup(this);
+            this._destroyEventListeners(s);
         }
         s = this.currentState();
         if (s) {
-            s.resume();
+            s._resume(this);
+            this._createEventListeners(s);
         }
+        return true;
     };
 
     Plastick.prototype.changeState = function (state) {
 
         var s = this.states.pop();
+
         if (s) {
-            s.cleanup();
+            s._cleanup(this);
+            this._destroyEventListeners(s);
         }
-        this.validateState(state);
-        this.states.push(state);
-        state.init();
+        if (state instanceof Plastick.State) {
+            this.states.push(state);
+            state._init(this);
+            this._createEventListeners(state);
+            return true;
+        } else {
+            return false;
+        }
     };
 
     Plastick.prototype.start = function (state) {
 
-        this.pushState(state);
-        this.isRunning = true;
-        this.startTime = window.performance.now();
-        this.tickTime = 0;
-        this.frameTime = 0;
-        this.stage.draw(this.gameLoop.bind(this));
-    };
+        if (state instanceof Plastick.State) {
 
-    Plastick.prototype.gameLoop = function () {
-
-        this.frameTime = this.gameTime();
-        this.update();
-        this.currentState().draw();
+            this.pushState(state);
+            this.isRunning = true;
+            this.startTime = window.performance.now();
+            this.tickTime = 0;
+            this._frameTime = 0;
+            this.stage.draw(this._gameLoop.bind(this));
+            return true;
+        } else {
+            return false;
+        }
     };
 
     Plastick.prototype.stop = function () {
 
         this.isRunning = false;
         this.stage.stop();
+        return true;
     };
 
     Plastick.prototype.cleanup = function () {
@@ -154,51 +157,133 @@
         while (this.states.length) {
             this.popState();
         }
-    };
-
-    Plastick.prototype.freeze = function () {
-
-        // freeze game when window blurs
-        if (this.freezeOnBlur) {
-            this.freezeStart = window.performance.now();
-        }
+        return true;
     };
 
     Plastick.prototype.gameTime = function () {
 
-        if (this.freezeStart !== null) {
-            this.freezeTime += window.performance.now() - this.freezeStart;
-            this.freezeStart = null;
+        return window.performance.now() - this.startTime - this._freezeLength;
+    };
+
+    Plastick.prototype._freeze = function () {
+
+        // freeze game when window blurs
+        if (this.freezeOnBlur && document[hidden]) {
+            this._freezeStart = window.performance.now();
+            this._destroyEventListeners(this.currentState());
         }
-        return window.performance.now() - this.startTime - this.freezeTime;
+        if (this.freezeOnBlur && !document[hidden]) {
+            this._freezeLength += window.performance.now() - this._freezeStart;
+            this._freezeStart = null;
+            this._createEventListeners(this.currentState());
+        }
+    };
+
+    Plastick.prototype._createEventListeners = function (state) {
+
+        var eventId;
+
+        for (eventId in state.listeners) {
+            document.addEventListener(eventId, state.listeners[eventId]);
+        }
+    };
+
+    Plastick.prototype._destroyEventListeners = function (state) {
+
+        var eventId;
+
+        for (eventId in state.listeners) {
+            document.removeEventListener(eventId, state.listeners[eventId]);
+        }
     };
 
     /**
-     * The logic portion of the main game loop. This is called once per canvas
-     * frame, but could simulate several game ticks in each call. The rate of the
+     * The main game loop. The game is simulated using a
+     * fixed timestep archtecture. _update() is called once per canvas frame,
+     * but could simulate several game ticks in each call. The rate of the
      * game tick simulation is decoupled from the canvas frame rate (which is
-     * governed by requestAnimationFrame(), via Facade). This allows the game to
-     * have accurate timing. If the simulation falls behind momentarily, it will
-     * try to catch up at a maximum rate of this.GAME_TICK_CHOKE.
+     * governed by requestAnimationFrame(), via Facade). If the simulation
+     * falls behind momentarily, it will try to catch up at a maximum rate of
+     * this.GAME_TICK_CHOKE ticks per call.
      *
      */
 
-    Plastick.prototype.update = function () {
+    Plastick.prototype._gameLoop = function () {
 
         var ticksUpdated = 0;
 
-        while ((this.gameTick * this.GAME_TICK_SPEED < this.frameTime) && (ticksUpdated < this.GAME_TICK_CHOKE)) {
+        this._frameTime = this.gameTime();
+        while (this._frameTime * this.GAME_TARGET_TPS / 1000 > this.currentTick &&
+                ticksUpdated < this.GAME_TICK_CHOKE) {
 
-            this.gameTick += 1;
+            this.currentTick += 1;
             ticksUpdated += 1;
-
-            this.currentState().update();
-
-            this.lastTickTime = this.tickTime;
+            this.currentState()._update(this);
             this.tickTime = this.gameTime();
         }
+        this.currentState()._draw(this);
     };
 
-    window.Plastick = Plastick;
+    // Plastick.State //////////////////////////////////////////////////////////
+
+    Plastick.State = function () {
+
+        this._init = function () { return undefined; };
+        this._destroy = function () { return undefined; };
+        this._update = function () { return undefined; };
+        this._draw = function () { return undefined; };
+        this._pause = function () { return undefined; };
+        this._resume = function () { return undefined; };
+        this.listeners = [];
+    };
+
+    Plastick.State.prototype.init = function (func) {
+
+        if (typeof func === 'function') { this._init = func; }
+        return this._init;
+    };
+
+    Plastick.State.prototype.destory = function (func) {
+
+        if (typeof func === 'function') { this._destory = func; }
+        return this._destory;
+    };
+
+    Plastick.State.prototype.update = function (func) {
+
+        if (typeof func === 'function') { this._update = func; }
+        return this._update;
+    };
+
+    Plastick.State.prototype.draw = function (func) {
+
+        if (typeof func === 'function') { this._draw = func; }
+        return this._draw;
+    };
+
+    Plastick.State.prototype.pause = function (func) {
+
+        if (typeof func === 'function') { this._pause = func; }
+        return this._pause;
+    };
+
+    Plastick.State.prototype.resume = function (func) {
+
+        if (typeof func === 'function') { this._resume = func; }
+        return this._resume;
+    };
+
+    /*
+     * AMD Support
+     */
+
+    if (typeof define === 'function' && define.amd !== undefined) {
+        define([], function () { return Plastick; });
+    } else if (typeof module === 'object' && module.exports !== undefined) {
+        module.exports = Plastick;
+    } else {
+        window.Plastick = Plastick;
+    }
+
 
 }());
