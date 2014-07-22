@@ -57,6 +57,7 @@
         this.GAME_TICK_CHOKE = 50; // max # of ticks per canvas frame
 
         this.stage = stage;
+        this.data = {};
         this.states = [];
         this.startTime = null;
         this.currentTick = 0;
@@ -229,7 +230,7 @@
     Plastick.State = function () {
 
         this._init = function () { return undefined; };
-        this._destroy = function () { return undefined; };
+        this._cleanup = function () { return undefined; };
         this._update = function () { return undefined; };
         this._draw = function () { return undefined; };
         this._pause = function () { return undefined; };
@@ -243,10 +244,10 @@
         return this._init;
     };
 
-    Plastick.State.prototype.destory = function (func) {
+    Plastick.State.prototype.cleanup = function (func) {
 
-        if (typeof func === 'function') { this._destory = func; }
-        return this._destory;
+        if (typeof func === 'function') { this._cleanup = func; }
+        return this._cleanup;
     };
 
     Plastick.State.prototype.update = function (func) {
