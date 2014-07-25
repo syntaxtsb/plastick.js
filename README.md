@@ -25,11 +25,13 @@ Create a Plastick object for your game by passing it the Facade object that will
 
 This will initialize the game with a pre-defined game state and start simulating the game.
 
-This returns false if no valid State is passed in, otherwise it returns true.
+This returns false if no valid State is passed in or if the game was already running, otherwise it returns true.
 
 **Plastick.stop()**
 
 This will immediately halt simulation of the game and clear the entire state stack.
+
+This returns false if the game was not already running, otherwise it returns true.
 
 **Plastick.pushState(_state_)**
 
@@ -76,6 +78,14 @@ This returns the number of milliseconds that has passed in the game. Note that g
 **Plastick.State()**
 
 This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The developer can redefine each one by passing it a callback method.
+
+**Plastick.State.registerListener(_element, type, callback_)**
+
+This method allows the developer to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.
+
+**Plastick.State.deregisterListener(_element, type, callback_)**
+
+This method allows the developer to deregister an event listener with this state. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.
 
 **Plastick.State.init(_func_)**
 

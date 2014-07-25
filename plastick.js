@@ -1,6 +1,3 @@
-/*jslint browser:true*/
-/*globals define*/
-
 (function () {
 
     'use strict';
@@ -80,59 +77,60 @@
 
     Plastick.prototype.pushState = function (state) {
 
-        var s = this.currentState();
+        var prevState = this.currentState();
 
-        if (s) {
-            s._pause(this);
-            this._destroyEventListeners(s);
+        if (prevState) {
+            prevState._pause(this);
+            this._destroyEventListeners(prevState);
         }
         if (state instanceof Plastick.State) {
             this.states.push(state);
             state._init(this);
             this._createEventListeners(state);
-            return true;
-        } else {
-            return false;
         }
+        return state instanceof Plastick.State;
     };
 
     Plastick.prototype.popState = function () {
 
-        var s = this.states.pop();
+        var prevState = this.states.pop(),
+            state;
 
-        if (s) {
-            s._cleanup(this);
-            this._destroyEventListeners(s);
+        if (prevState) {
+            prevState._cleanup(this);
+            this._destroyEventListeners(prevState);
         }
-        s = this.currentState();
-        if (s) {
-            s._resume(this);
-            this._createEventListeners(s);
+        state = this.currentState();
+        if (state) {
+            state._resume(this);
+            this._createEventListeners(state);
+        } else {
+            this.stop();
         }
-        return true;
+        return prevState !== undefined;
     };
 
     Plastick.prototype.changeState = function (state) {
 
-        var s = this.states.pop();
+        var prevState = this.states.pop();
 
-        if (s) {
-            s._cleanup(this);
-            this._destroyEventListeners(s);
+        if (prevState) {
+            prevState._cleanup(this);
+            this._destroyEventListeners(prevState);
         }
         if (state instanceof Plastick.State) {
             this.states.push(state);
             state._init(this);
             this._createEventListeners(state);
-            return true;
-        } else {
-            return false;
         }
+        return prevState !== undefined && state instanceof Plastick.State;
     };
 
     Plastick.prototype.start = function (state) {
 
-        if (state instanceof Plastick.State) {
+        var wasRunning = this.isRunning;
+
+        if (state instanceof Plastick.State && !wasRunning) {
 
             this.pushState(state);
             this.isRunning = true;
@@ -141,16 +139,20 @@
             this._frameTime = 0;
             this.stage.draw(this._gameLoop.bind(this));
             return true;
-        } else {
-            return false;
         }
+        return state instanceof Plastick.State && !this.wasRunning;
     };
 
     Plastick.prototype.stop = function () {
 
-        this.isRunning = false;
-        this.stage.stop();
-        return true;
+        var wasRunning = this.isRunning;
+
+        if (wasRunning) {
+            this.isRunning = false;
+            this.stage.stop();
+            this.cleanup();
+        }
+        return wasRunning;
     };
 
     Plastick.prototype.cleanup = function () {
@@ -182,20 +184,16 @@
 
     Plastick.prototype._createEventListeners = function (state) {
 
-        var eventId;
-
-        for (eventId in state.listeners) {
-            document.addEventListener(eventId, state.listeners[eventId]);
-        }
+        state.listeners.forEach(function (listener) {
+            listener.element.addEventListener(listener.eventType, listener.callback);
+        });
     };
 
     Plastick.prototype._destroyEventListeners = function (state) {
 
-        var eventId;
-
-        for (eventId in state.listeners) {
-            document.removeEventListener(eventId, state.listeners[eventId]);
-        }
+        state.listeners.forEach(function (listener) {
+            listener.element.removeEventListener(listener.eventType, listener.callback);
+        });
     };
 
     /**
@@ -236,6 +234,27 @@
         this._pause = function () { return undefined; };
         this._resume = function () { return undefined; };
         this.listeners = [];
+    };
+
+    Plastick.State.prototype.registerListener = function (element, type, callback) {
+
+        this.listeners.push({
+            element: element,
+            eventType: type,
+            callback: callback
+        });
+    };
+
+    Plastick.State.prototype.deregisterListener = function (element, type, callback) {
+
+        var oldListeners;
+
+        oldListeners = this.listeners.slice();
+        oldListeners.forEach(function (listener, index) {
+            if (listener.element === element && listener.eventType === type && (listener.callback === callback || callback === undefined)) {
+                this.listeners.splice(index, 1);
+            }
+        });
     };
 
     Plastick.State.prototype.init = function (func) {
