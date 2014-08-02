@@ -17,4 +17,4 @@ Installation
 Usage
 -----
 
-Documentation can be accessed [online](http://rawgit.com/syntaxtsb/plastic.js/master/doc/index.html) or in the /doc folder.
+Documentation can be accessed [online](http://rawgit.com/syntaxtsb/plastic.js/master/docs/index.html) or in the /doc folder.

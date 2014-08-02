@@ -45,6 +45,7 @@
      * @property {Integer} currentTick Current unit of game time.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
+     * @property {Integer} GAME_TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
      * @param {Object} stage The Facade object that will handle drawing this Plastick object.
      * @return {Object} New Plastick object.
      * @api public
