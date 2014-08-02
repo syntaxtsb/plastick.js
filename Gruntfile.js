@@ -33,6 +33,11 @@ module.exports = function (grunt) {
                 }
             }
         },
+        shell: {
+            buildDoc: {
+                command: 'dox < Plastick.js > docs/Plastick.json; cd docs/; doxdox.py --title="Plastick" --description="A lightweight, time-accurate game loop framework for Javascript." > index.html; rm Plastick.json'
+            }
+        },
         jasmine: {
             test: {
                 src: 'plastick.min.js',
@@ -44,12 +49,12 @@ module.exports = function (grunt) {
         watch: {
             default: {
                 files: ['plastick.js'],
-                tasks: ['jslint', 'uglify']
+                tasks: ['jslint', 'uglify', 'shell']
             }
         }
     });
 
-    grunt.registerTask('default', [ 'jslint', 'uglify' ]);
+    grunt.registerTask('default', [ 'jslint', 'uglify', 'shell' ]);
     grunt.registerTask('test', [ 'jasmine' ]);
 
 };
