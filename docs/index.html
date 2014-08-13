@@ -214,13 +214,13 @@
 
                     
 
-                    <p><b>startTime</b> <code>Boolean</code></p>
-                    <p>This is the timestamp</p>
+                    <p><b>startTime</b> <code>Float</code></p>
+                    <p>The time the game started running.</p>
 
                     
 
                     <p><b>currentTick</b> <code>Integer</code></p>
-                    <p>Current unit of game time.</p>
+                    <p>Current unit of game time. Each tick represents one execution of the game state's update() method.</p>
 
                     
 
@@ -231,6 +231,11 @@
 
                     <p><b>data</b> <code>Object</code></p>
                     <p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
+
+                    
+
+                    <p><b>GAME_TARGET_TPS</b> <code>Integer</code></p>
+                    <p>The target rate of game simulation, in ticks per second. Do not modify this while the game is running.</p>
 
                     
 

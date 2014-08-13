@@ -1,6 +1,6 @@
 {
     "name": "plastick.js",
-    "description": "A lightweight game loop framework utilizing Facade.js.",
+    "description": "A lightweight, time-accurate game loop framework for Javascript.",
     "main": "plastick.js",
     "version": "0.2.0",
     "devDependencies": {

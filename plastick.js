@@ -15,7 +15,7 @@
         }
     }());
 
-    // page focus shims --------------------------------------------------------
+    // page focus polyfill -----------------------------------------------------
 
     var hidden, visibilityChange;
     if (document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support
@@ -41,8 +41,8 @@
      *
      * @property {Object} stage Reference to the Facade object linked to this Plastick.
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
-     * @property {Boolean} startTime This is the timestamp
-     * @property {Integer} currentTick Current unit of game time.
+     * @property {Float} startTime The time the game started running.
+     * @property {Integer} currentTick Current unit of game time. Each tick represents one execution of the game state's update() method.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Integer} GAME_TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
