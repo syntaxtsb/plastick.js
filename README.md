@@ -17,4 +17,6 @@ Installation
 Usage
 -----
 
-Documentation can be accessed [online](http://rawgit.com/syntaxtsb/plastick.js/master/docs/index.html) or in the /doc folder.
+[![online documentation](http://doxdox.herokuapp.com/images/badge.svg)](http://doxdox.herokuapp.com/syntaxtsb/plastick.js)
+
+Documentation can also be accessed from the /docs folder.
