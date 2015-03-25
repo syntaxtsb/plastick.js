@@ -115,6 +115,10 @@
 
                 
 
+                <li class="scope-public"><a href="#plastick.prototype.lerp">Plastick.lerp()</a></li>
+
+                
+
                 <li class="scope-private"><a href="#plastick.prototype.freeze">Plastick._freeze()</a></li>
 
                 
@@ -224,6 +228,11 @@
 
                     
 
+                    <p><b>tickAlpha</b> <code>Float</code></p>
+                    <p>Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.</p>
+
+                    
+
                     <p><b>isRunning</b> <code>Boolean</code></p>
                     <p>True if the Plastick object is in a running state.</p>
 
@@ -236,6 +245,11 @@
 
                     <p><b>GAME_TARGET_TPS</b> <code>Integer</code></p>
                     <p>The target rate of game simulation, in ticks per second. Do not modify this while the game is running.</p>
+
+                    
+
+                    <p><b>GAME_TICK_CHOKE</b> <code>Integer</code></p>
+                    <p>The maximum number of ticks simulated per canvas frame.</p>
 
                     
 
@@ -259,7 +273,7 @@
 
                         <div class="highlight"><pre><span class="kd">function</span> <span class="nx">Plastick</span><span class="p">(</span><span class="nx">stage</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">=</span> <span class="mi">60</span><span class="p">;</span> <span class="c1">// target game ticks per second</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span> <span class="c1">// target game ticks per second</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TICK_CHOKE</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="c1">// max # of ticks per canvas frame</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">stage</span> <span class="o">=</span> <span class="nx">stage</span><span class="p">;</span>
@@ -268,6 +282,7 @@
     <span class="k">this</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">tickTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">freezeOnBlur</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">_isRunning</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
@@ -781,6 +796,87 @@
 
                 
 
+                <div class="method scope-public">
+
+                    <h2 id="plastick.prototype.lerp"><a href="#plastick.prototype.lerp" class="permalink">#</a>Plastick.lerp() </h2>
+
+                    <p>Performs a linear interpolation between two numeric values using Plastick.tickAlpha.</p>
+
+                    
+
+                    <h3>Parameters</h3>
+
+                    
+
+                    <p>
+                        <b>before</b>
+                        <code>Float</code>
+                        
+                    </p>
+                    <p>The "before" value.</p>
+
+                    
+
+                    <p>
+                        <b>after</b>
+                        <code>Float</code>
+                        
+                    </p>
+                    <p>The "after" value.</p>
+
+                    
+
+                    <p>
+                        <b>alpha</b>
+                        <code>Float</code>
+                        
+                        <span class="label label-default">Optional</span>
+                        
+                    </p>
+                    <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.</p>
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    <h3>Examples</h3>
+
+                    <div class="highlight"><pre><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">game</span><span class="p">.</span><span class="nx">lerp</span><span class="p">(</span><span class="nx">sprite</span><span class="p">.</span><span class="nx">prevPosition</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">sprite</span><span class="p">.</span><span class="nx">currPosition</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span>
+</pre></div>
+
+
+                    
+
+                    <div class="code">
+
+                        <h3>Code</h3>
+
+                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">lerp</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">before</span><span class="p">,</span> <span class="nx">after</span><span class="p">,</span> <span class="nx">alpha</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">alpha</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nx">after</span> <span class="o">-</span> <span class="nx">before</span><span class="p">)</span> <span class="o">*</span> <span class="nx">alpha</span> <span class="o">+</span> <span class="nx">before</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">after</span> <span class="o">-</span> <span class="nx">before</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">+</span> <span class="nx">before</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+                    </div>
+
+                    <h3>Returns</h3>
+
+                    <p><code>Float</code> The result of the linear interpolation.</p>
+
+                </div>
+
+                
+
                 <div class="method scope-private">
 
                     <h2 id="plastick.prototype.freeze"><a href="#plastick.prototype.freeze" class="permalink">#</a>Plastick._freeze() <span class="label label-default">private</span></h2>
@@ -957,7 +1053,7 @@
 
                     <h2 id="plastick.prototype.gameloop"><a href="#plastick.prototype.gameloop" class="permalink">#</a>Plastick._gameLoop() <span class="label label-default">private</span></h2>
 
-                    <p>The main game loop. The game is simulated using a fixed timestep archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.</p>
+                    <p>The main game loop. The game is simulated using a fixed time step archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.</p>
 
                     
 
@@ -984,6 +1080,7 @@
         <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">().</span><span class="nx">_update</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
         <span class="k">this</span><span class="p">.</span><span class="nx">tickTime</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">();</span>
     <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">()</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">().</span><span class="nx">_draw</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
 <span class="p">};</span>
 
@@ -1337,7 +1434,7 @@
 
                     <h2 id="plastick.state.prototype.update"><a href="#plastick.state.prototype.update" class="permalink">#</a>Plastick.State.update() </h2>
 
-                    <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed timestep design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
+                    <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
 
                     
 

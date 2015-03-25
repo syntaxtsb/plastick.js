@@ -32,7 +32,7 @@
         visibilityChange = 'webkitvisibilitychange';
     }
 
-    // Plastick ////////////////////////////////////////////////////////////////
+    // Plastick v0.4 ///////////////////////////////////////////////////////////
 
     /**
      * Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
@@ -43,9 +43,11 @@
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
      * @property {Float} startTime The time the game started running.
      * @property {Integer} currentTick Current unit of game time. Each tick represents one execution of the game state's update() method.
+     * @property {Float} tickAlpha Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Integer} GAME_TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
+     * @property {Integer} GAME_TICK_CHOKE The maximum number of ticks simulated per canvas frame.
      * @param {Object} stage The Facade object that will handle drawing this Plastick object.
      * @return {Object} New Plastick object.
      * @api public
@@ -53,7 +55,7 @@
 
     function Plastick(stage) {
 
-        this.GAME_TARGET_TPS = 60; // target game ticks per second
+        this.GAME_TARGET_TPS = 30; // target game ticks per second
         this.GAME_TICK_CHOKE = 50; // max # of ticks per canvas frame
 
         this.stage = stage;
@@ -62,6 +64,7 @@
         this.startTime = null;
         this.currentTick = 0;
         this.tickTime = 0;
+        this.tickAlpha = 0;
         this.freezeOnBlur = true;
 
         this._isRunning = false;
@@ -258,6 +261,25 @@
     };
 
     /**
+     * Performs a linear interpolation between two numeric values using Plastick.tickAlpha.
+     *
+     *     var x = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
+     *
+     * @param {Float} before The "before" value.
+     * @param {Float} after The "after" value.
+     * @param {Float?} alpha If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.
+     * @return {Float} The result of the linear interpolation.
+     */
+
+    Plastick.prototype.lerp = function (before, after, alpha) {
+
+        if (alpha !== undefined) {
+            return (after - before) * alpha + before;
+        }
+        return (after - before) * this.tickAlpha + before;
+    };
+
+    /**
      * Freezes or unfreezes the game simulation (depending on the "blur" state of the web page when it's called). The example code shows how Plastick uses this method.
      *
      *     document.addEventListener(visibilityChange, this._freeze.bind(this));
@@ -315,7 +337,7 @@
     };
 
     /**
-     * The main game loop. The game is simulated using a fixed timestep archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.
+     * The main game loop. The game is simulated using a fixed time step archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.
      *
      * @return {void}
      * @api private
@@ -334,6 +356,7 @@
             this.currentState()._update(this);
             this.tickTime = this.gameTime();
         }
+        this.tickAlpha = this.gameTime() * this.GAME_TARGET_TPS / 1000 - this.currentTick + 1;
         this.currentState()._draw(this);
     };
 
@@ -436,7 +459,7 @@
     };
 
     /**
-     * Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed timestep design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.
+     * Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.
      *
      *     menuState.update(function() {...});
      *
