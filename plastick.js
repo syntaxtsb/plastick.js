@@ -32,7 +32,7 @@
         visibilityChange = 'webkitvisibilitychange';
     }
 
-    // Plastick v0.4 ///////////////////////////////////////////////////////////
+    // Plastick v0.3.0 /////////////////////////////////////////////////////////
 
     /**
      * Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
