@@ -2,7 +2,7 @@
     "name": "plastick.js",
     "description": "A lightweight, time-accurate game loop framework for Javascript.",
     "main": "plastick.js",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "devDependencies": {
         "grunt": "0.4.5",
         "grunt-contrib-watch": "0.6.1",
@@ -11,9 +11,14 @@
         "grunt-jslint": "1.1.12",
         "grunt-notify": "0.3.0",
         "grunt-shell": "0.6.4",
+        "grunt-doxdox": "0.0.11",
         "matchdep": "0.3.0"
     },
     "scripts": {
         "test": "grunt test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/syntaxtsb/plastick.js.git"
     }
 }

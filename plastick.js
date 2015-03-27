@@ -32,7 +32,7 @@
         visibilityChange = 'webkitvisibilitychange';
     }
 
-    // Plastick v0.3.0 /////////////////////////////////////////////////////////
+    // Plastick v0.3.1 /////////////////////////////////////////////////////////
 
     /**
      * Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
@@ -267,7 +267,7 @@
      *
      * @param {Float} before The "before" value.
      * @param {Float} after The "after" value.
-     * @param {Float?} alpha If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.
+     * @param {Float} [alpha] If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.
      * @return {Float} The result of the linear interpolation.
      */
 
@@ -356,8 +356,11 @@
             this.currentState()._update(this);
             this.tickTime = this.gameTime();
         }
-        this.tickAlpha = this.gameTime() * this.GAME_TARGET_TPS / 1000 - this.currentTick + 1;
-        this.currentState()._draw(this);
+        // skip draw if game was stopped (no state on the stack!)
+        if (this._isRunning) {
+            this.tickAlpha = this.gameTime() * this.GAME_TARGET_TPS / 1000 - this.currentTick + 1;
+            this.currentState()._draw(this);
+        }
     };
 
     // Plastick.State //////////////////////////////////////////////////////////
@@ -409,7 +412,7 @@
      *
      * @param {Object} element The object to deregister the listener(s) for.
      * @param {String} type The event to deregister the listener(s) for.
-     * @param {Function?} callback The specific callback function to deregister.
+     * @param {Function} [callback] The specific callback function to deregister.
      * @return {void}
      * @api public
      */

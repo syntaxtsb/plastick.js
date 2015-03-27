@@ -1,175 +1,366 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8" />
-<title>Plastick - A lightweight, time-accurate game loop framework for Javascript.</title>
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1">
+<title>plastick.js &#8212; A lightweight, time-accurate game loop framework for Javascript.</title>
 <style>
 
-.hll{background-color:#ffc}.c{color:#998;font-style:italic}.err{color:#a61717;background-color:#e3d2d2}.k{color:#000;font-weight:700}.o{color:#000;font-weight:700}.cm{color:#998;font-style:italic}.cp{color:#999;font-weight:700;font-style:italic}.c1{color:#998;font-style:italic}.cs{color:#999;font-weight:700;font-style:italic}.gd{color:#000;background-color:#fdd}.ge{color:#000;font-style:italic}.gr{color:#a00}.gh{color:#999}.gi{color:#000;background-color:#dfd}.go{color:#888}.gp{color:#555}.gs{font-weight:700}.gu{color:#aaa}.gt{color:#a00}.kc{color:#000;font-weight:700}.kd{color:#000;font-weight:700}.kn{color:#000;font-weight:700}.kp{color:#000;font-weight:700}.kr{color:#000;font-weight:700}.kt{color:#458;font-weight:700}.m{color:#099}.s{color:#d01040}.na{color:teal}.nb{color:#0086B3}.nc{color:#458;font-weight:700}.no{color:teal}.nd{color:#3c5d5d;font-weight:700}.ni{color:purple}.ne{color:#900;font-weight:700}.nf{color:#900;font-weight:700}.nl{color:#900;font-weight:700}.nn{color:#555}.nt{color:navy}.nv{color:teal}.ow{color:#000;font-weight:700}.w{color:#bbb}.mf{color:#099}.mh{color:#099}.mi{color:#099}.mo{color:#099}.sb{color:#d01040}.sc{color:#d01040}.sd{color:#d01040}.s2{color:#d01040}.se{color:#d01040}.sh{color:#d01040}.si{color:#d01040}.sx{color:#d01040}.sr{color:#009926}.s1{color:#d01040}.ss{color:#990073}.bp{color:#999}.vc{color:teal}.vg{color:teal}.vi{color:teal}.il{color:#099}
-
-@media (max-width: 992px) {
-
-    .container {
-        width: 970px !important;
-        max-width: none !important;
-    }
-    .col-md-3 {
-        width: 25% !important;
-        float: left;
-    }
-    .col-md-9 {
-        width: 75% !important;
-        float: left;
-    }
-
+.back-to-top {
+    display: none;
+    position: fixed;
+    right: 1em;
+    bottom: 1em;
+    z-index: 999;
 }
 
-.method {
-    margin-bottom: 40px;
+.back-to-top a {
+    display: block;
+    padding: .5em .6em;
+    line-height: 1em;
+    border-radius: .25em;
+    background: #fff;
+}
+
+.back-to-top a svg {
+    vertical-align: middle;
 }
 
 .permalink {
     position: absolute;
-    margin-left: -25px;
+    margin-left: -.75em;
     font-weight: normal;
     color: #eee;
 }
 
 .permalink:hover {
-    color: #666;
     text-decoration: none;
 }
 
-.bs-footer {
-    margin: 50px auto;
+.method h2 {
+    line-height: 1.3em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.permalink:hover,
+.doxdox .menu .file {
+    color: #E54D89;
+}
+
+pre .hljs {
+    padding: 0;
+    background: none;
+}
+
+.doxdox .wrap {
+    padding: 0 1em;
+}
+
+.doxdox .jumbotron p,
+.doxdox .label-default {
+    -webkit-font-smoothing: antialiased;
+}
+
+.doxdox .jumbotron {
+    margin-bottom: 0;
+    background-color: #2B303E;
+}
+
+.doxdox .jumbotron h1,
+.doxdox .jumbotron h1 a {
+    color: #eee;
+}
+
+.doxdox .jumbotron p {
+    color: #ccc;
+}
+
+.doxdox .menu {
+    margin: 1.5em 0 0 0;
+    padding: 0;
+}
+
+.doxdox .menu li {
+    list-style: none;
+}
+
+.doxdox .menu li ul {
+    padding: 0;
+}
+
+.doxdox .menu li a {
+    display: block;
+    padding: .25em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doxdox .menu .scope-private a {
+    color: #8BAAC6;
+}
+
+.doxdox .bs-footer {
+    margin: 3em auto;
     color: #777;
     text-align: center;
 }
 
 </style>
+<script>
+
+(function (w, d, f) {
+
+    'use strict';
+
+    var protocol = w.location.protocol === 'file:' ? 'http:' : w.location.protocol,
+        resource = [
+            '//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css',
+            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css',
+            '//code.jquery.com/jquery-2.1.3.js',
+            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js'
+        ];
+
+    function loadResource(url) {
+
+        var tag;
+
+        if (url.match(/\.js$/)) {
+
+            tag = d.createElement('script');
+            tag.setAttribute('src', protocol + url);
+
+        } else if (url.match(/\.css$/)) {
+
+            tag = d.createElement('link');
+            tag.setAttribute('rel', 'stylesheet');
+            tag.setAttribute('href', protocol + url);
+
+        }
+
+        tag.addEventListener('load', function () {
+
+            if (resource.length) {
+
+                loadResource(resource.shift());
+
+            } else {
+
+                if ($.isReady) {
+
+                    f();
+
+                } else {
+
+                    $(document).ready(f);
+
+                }
+
+            }
+
+        });
+
+        d.head.appendChild(tag);
+
+    }
+
+    loadResource(resource.shift());
+
+}(window, document, function () {
+
+    'use strict';
+
+    var headerHeight = $('.jumbotron').outerHeight(true),
+        $backToTop = $('.back-to-top');
+
+    function handleScrollEvent() {
+
+        if (window.scrollY > headerHeight && $backToTop.not(':visible')) {
+
+            $backToTop.fadeIn();
+
+        } else if (window.scrollY < headerHeight && $backToTop.is(':visible')) {
+
+            $backToTop.fadeOut();
+
+        }
+
+    }
+
+    $('pre code:not(.hljs)').each(function () {
+        hljs.highlightBlock(this);
+    });
+
+    $(window).on('scroll', handleScrollEvent);
+
+    handleScrollEvent();
+
+}));
+
+</script>
 </head>
 
-<body>
+<body class="doxdox">
 
+<div class="back-to-top">
+    <a href="#"> <svg xmlns="http://www.w3.org/2000/svg" width="13px" height="14px" viewBox="0 0 13 14"><path d="M7.18761156,13 L7.18761156,5.49249703 L10.4587853,5.49249703 L5.09931763,0.113558129 L-0.26015,5.49249703 L3.01102371,5.49249703 L3.01102371,13 L7.18761156,13 Z" fill="#428bca"></path></svg> Back to Top</a>
+</div>
 
+<div class="jumbotron">
+
+    <div class="container">
+
+        <h1>
+                plastick.js
+            <small>0.3.0</small>
+        </h1>
+
+        <p>A lightweight, time-accurate game loop framework for Javascript.</p>
+
+    </div>
+
+</div>
 
 <div class="wrap">
 
     <div class="container">
 
-        <div class="page-header">
-            <div class="pull-right">
-                <label><input type="checkbox" name="toggle-code" class="toggle-code-blocks" /> Toggle Code Blocks</label><br />
-                <label><input type="checkbox" name="toggle-private" class="toggle-private" /> Toggle Private Methods/Function</label>
-            </div>
-            <h1>Plastick <small>A lightweight, time-accurate game loop framework for Javascript.</small></h1>
-        </div>
-
         <div class="row">
 
-            <div class="col-md-3">
+            <div class="col-md-3 hidden-sm hidden-xs">
 
-                <ul class="nav">
+                <ul class="menu">
 
-                
 
-                <li class="scope-public"><a href="#plastick">Plastick()</a></li>
+                    <li>
+                        <a href="#Plastick.js" class="file"><b>Plastick.js</b></a>
+                        <ul>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.start">Plastick.start()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick" title="Plastick">Plastick</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.stop">Plastick.stop()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.start" title="Plastick.start">Plastick.start</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.isrunning">Plastick.isRunning()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.stop" title="Plastick.stop">Plastick.stop</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.pushstate">Plastick.pushState()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.isrunning" title="Plastick.isRunning">Plastick.isRunning</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.popstate">Plastick.popState()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.pushstate" title="Plastick.pushState">Plastick.pushState</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.changestate">Plastick.changeState()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.popstate" title="Plastick.popState">Plastick.popState</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.currentstate">Plastick.currentState()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.changestate" title="Plastick.changeState">Plastick.changeState</a>
+                        </li>
 
-                
 
-                <li class="scope-private"><a href="#plastick.prototype.cleanup">Plastick._cleanup()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.currentstate" title="Plastick.currentState">Plastick.currentState</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.gametime">Plastick.gameTime()</a></li>
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.prototype.lerp">Plastick.lerp()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.gametime" title="Plastick.gameTime">Plastick.gameTime</a>
+                        </li>
 
-                
 
-                <li class="scope-private"><a href="#plastick.prototype.freeze">Plastick._freeze()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.lerp" title="Plastick.lerp">Plastick.lerp</a>
+                        </li>
 
-                
 
-                <li class="scope-private"><a href="#plastick.prototype.createeventlisteners">Plastick._createEventListeners()</a></li>
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._freeze" title="Plastick._freeze">Plastick._freeze</a>
+                        </li>
 
-                
 
-                <li class="scope-private"><a href="#plastick.prototype.destroyeventlisteners">Plastick._destroyEventListeners()</a></li>
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._createeventlisteners" title="Plastick._createEventListeners">Plastick._createEventListeners</a>
+                        </li>
 
-                
 
-                <li class="scope-private"><a href="#plastick.prototype.gameloop">Plastick._gameLoop()</a></li>
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._destroyeventlisteners" title="Plastick._destroyEventListeners">Plastick._destroyEventListeners</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state">Plastick.State()</a></li>
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._gameloop" title="Plastick._gameLoop">Plastick._gameLoop</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.registerlistener">Plastick.State.registerListener()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state" title="Plastick.State">Plastick.State</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.deregisterlistener">Plastick.State.deregisterListener()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.registerlistener" title="Plastick.State.registerListener">Plastick.State.registerListener</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.init">Plastick.State.init()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.deregisterlistener" title="Plastick.State.deregisterListener">Plastick.State.deregisterListener</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.cleanup">Plastick.State.cleanup()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.init" title="Plastick.State.init">Plastick.State.init</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.update">Plastick.State.update()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.cleanup" title="Plastick.State.cleanup">Plastick.State.cleanup</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.draw">Plastick.State.draw()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.update" title="Plastick.State.update">Plastick.State.update</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.pause">Plastick.State.pause()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.draw" title="Plastick.State.draw">Plastick.State.draw</a>
+                        </li>
 
-                
 
-                <li class="scope-public"><a href="#plastick.state.prototype.resume">Plastick.State.resume()</a></li>
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.pause" title="Plastick.State.pause">Plastick.State.pause</a>
+                        </li>
 
-                
+
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.state.prototype.resume" title="Plastick.State.resume">Plastick.State.resume</a>
+                        </li>
+
+
+                        </ul>
+
+                    </li>
+
 
                 </ul>
 
@@ -177,1494 +368,1234 @@
 
             <div class="col-md-9">
 
-                
 
-                <div class="method scope-public">
+                <a id="Plastick.js" />
 
-                    <h2 id="plastick"><a href="#plastick" class="permalink">#</a>Plastick() </h2>
 
-                    <p>Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
+                    <div class="method scope-public">
 
-                    
+                        <h2 id="plastick.js-plastick">
+                            <a href="#plastick.js-plastick" class="permalink">#</a> Plastick(stage)
+                        </h2>
 
-                    <h3>Parameters</h3>
+                        <p>Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
 
-                    
 
-                    <p>
-                        <b>stage</b>
-                        <code>Object</code>
+                        <pre><code>var game = new Plastick(stage);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>stage</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The Facade object that will handle drawing this Plastick object.</p>
+
+
+
+                        </section>
+
+
+
+                        <section class="property">
+
+                            <h3>Properties</h3>
+
+
+                                <p>
+                                    <b>stage</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>Reference to the Facade object linked to this Plastick.</p>
+
+
+
+                                <p>
+                                    <b>states</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).</p>
+
+
+
+                                <p>
+                                    <b>startTime</b>
+                                        <code>Float</code>
+                                </p>
+
+                                <p>The time the game started running.</p>
+
+
+
+                                <p>
+                                    <b>currentTick</b>
+                                        <code>Integer</code>
+                                </p>
+
+                                <p>Current unit of game time. Each tick represents one execution of the game state's update() method.</p>
+
+
+
+                                <p>
+                                    <b>tickAlpha</b>
+                                        <code>Float</code>
+                                </p>
+
+                                <p>Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.</p>
+
+
+
+                                <p>
+                                    <b>isRunning</b>
+                                        <code>Boolean</code>
+                                </p>
+
+                                <p>True if the Plastick object is in a running state.</p>
+
+
+
+                                <p>
+                                    <b>data</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
+
+
+
+                                <p>
+                                    <b>GAME_TARGET_TPS</b>
+                                        <code>Integer</code>
+                                </p>
+
+                                <p>The target rate of game simulation, in ticks per second. Do not modify this while the game is running.</p>
+
+
+
+                                <p>
+                                    <b>GAME_TICK_CHOKE</b>
+                                        <code>Integer</code>
+                                </p>
+
+                                <p>The maximum number of ticks simulated per canvas frame.</p>
+
+
+
+                        </section>
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Object</code>
+                                    </p>
+
+                                    <p>New Plastick object.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.start">
+                            <a href="#plastick.js-plastick.prototype.start" class="permalink">#</a> Plastick.start(state)
+                        </h2>
+
+                        <p>This will initialize the game with a pre-defined game state and start simulating the game.</p>
+
+
+                        <pre><code>game.start(introState);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>state</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The Plastick.State object to start simulating with.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Boolean</code>
+                                    </p>
+
+                                    <p>This returns <code>false</code> if no valid State is passed in or if the game was already running, otherwise it returns <code>true</code>.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.stop">
+                            <a href="#plastick.js-plastick.prototype.stop" class="permalink">#</a> Plastick.stop()
+                        </h2>
+
+                        <p>This will immediately halt simulation of the game and clear the
+entire state stack.</p>
+
+
+                        <pre><code>game.stop();
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Boolean</code>
+                                    </p>
+
+                                    <p>This returns <code>false</code> if the game was not already running, otherwise it returns <code>true</code>.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.isrunning">
+                            <a href="#plastick.js-plastick.prototype.isrunning" class="permalink">#</a> Plastick.isRunning()
+                        </h2>
+
+                        <p>Used to check if the game is running.</p>
+
+
+                        <pre><code>if (game.isRunning()) { console.log('The game is running!'); }
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Boolean</code>
+                                    </p>
+
+                                    <p>This returns <code>true</code> if <code>Plastick.start()</code> has been called and <code>Plastick.stop()</code> has not yet been called.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.pushstate">
+                            <a href="#plastick.js-plastick.prototype.pushstate" class="permalink">#</a> Plastick.pushState(state)
+                        </h2>
+
+                        <p>This will pause the current game state and start simulation of a new game state by doing the following: <ul><li>Pause simulation of the current state by calling its pause() method and destroying its event listeners</li><li>Push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul></p>
+
+
+                        <pre><code>game.pushState(pauseState);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>state</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The <code>Plastick.State</code> object to switch simulation to.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Boolean</code>
+                                    </p>
+
+                                    <p>This returns <code>false</code> if no valid <code>Plastick.State</code> is passed in, otherwise it returns <code>true</code>.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.popstate">
+                            <a href="#plastick.js-plastick.prototype.popstate" class="permalink">#</a> Plastick.popState()
+                        </h2>
+
+                        <p>This will end the current game state and resume simulation of the previous game state by doing the following:<ul><li>End simulation of the current state by calling its <code>cleanup()</code> method and destroying its event listeners</li><li>Pop the current state off the state stack, making the prior state the current state</li><li>Call the prior state's <code>resume()</code> method and create its event listeners</li></ul>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
+
+
+                        <pre><code>game.popState();
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Object</code>
+                                    </p>
+
+                                    <p>This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack, otherwise this returns <code>true</code>.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.changestate">
+                            <a href="#plastick.js-plastick.prototype.changestate" class="permalink">#</a> Plastick.changeState(state)
+                        </h2>
+
+                        <p>This will redirect simulation from the current game state to a new game state by doing the following:<ul><li>End simulation of the current state by calling its cleanup() method and destroying its event listeners</li><li>Pop the current state off the state stack and push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul>If calling this method empties the state stack, Plastick.stop() will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
+
+
+                        <pre><code>game.changeState(menuState);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>state</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The <code>Plastick.State</code> object to switch simulation to.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Object</code>
+                                    </p>
+
+                                    <p>This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack or if no valid <code>Plastick.State</code> is passed in, otherwise this returns <code>true</code>.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.currentstate">
+                            <a href="#plastick.js-plastick.prototype.currentstate" class="permalink">#</a> Plastick.currentState()
+                        </h2>
+
+                        <p>This returns the State currently being simulated.</p>
+
+
+                        <pre><code>game.currentState();
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Object</code>
+                                    </p>
+
+                                    <p>Current game state, as a <code>Plastick.State</code> object.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
+                        <h2 id="plastick.js-plastick.prototype._cleanup">
+                            <a href="#plastick.js-plastick.prototype._cleanup" class="permalink">#</a> Plastick._cleanup()
+                            <small>private method</small>
+                        </h2>
+
+                        <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
+
+
+                        <pre><code>game._cleanup();</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>true</code>
+                                    </p>
+
+                                    
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.gametime">
+                            <a href="#plastick.js-plastick.prototype.gametime" class="permalink">#</a> Plastick.gameTime()
+                        </h2>
+
+                        <p>This returns the number of milliseconds that has passed in the game. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
+
+
+                        <pre><code>game.gameTime();
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Float</code>
+                                    </p>
+
+                                    <p>The number of milliseconds that have passed since <code>Plastick.start()</code> was called, not including &quot;frozen&quot; time (blurred focus).</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.lerp">
+                            <a href="#plastick.js-plastick.prototype.lerp" class="permalink">#</a> Plastick.lerp(before, after[, alpha])
+                        </h2>
+
+                        <p>Performs a linear interpolation between two numeric values using Plastick.tickAlpha.</p>
+
+
+                        <pre><code>var x = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>before</b>
+                                        <code>Float</code>
+                                </p>
+
+                                <p>The &quot;before&quot; value.</p>
+
+
+
+                                <p>
+                                    <b>after</b>
+                                        <code>Float</code>
+                                </p>
+
+                                <p>The &quot;after&quot; value.</p>
+
+
+
+                                <p>
+                                    <b>alpha</b>
+                                        <code>Float</code>
+                                        <span class="label label-default">Optional</span>
+                                </p>
+
+                                <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Float</code>
+                                    </p>
+
+                                    <p>The result of the linear interpolation.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
+                        <h2 id="plastick.js-plastick.prototype._freeze">
+                            <a href="#plastick.js-plastick.prototype._freeze" class="permalink">#</a> Plastick._freeze()
+                            <small>private method</small>
+                        </h2>
+
+                        <p>Freezes or unfreezes the game simulation (depending on the &quot;blur&quot; state of the web page when it's called). The example code shows how Plastick uses this method.</p>
+
+
+                        <pre><code>document.addEventListener(visibilityChange, this._freeze.bind(this));
+</code></pre>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
+                        <h2 id="plastick.js-plastick.prototype._createeventlisteners">
+                            <a href="#plastick.js-plastick.prototype._createeventlisteners" class="permalink">#</a> Plastick._createEventListeners(state)
+                            <small>private method</small>
+                        </h2>
+
+                        <p>Creates event listeners registered to a game state.</p>
+
+
+                        <pre><code>this._createEventListeners(state);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>state</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The <code>Plastick.State</code> that is now current.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
+                        <h2 id="plastick.js-plastick.prototype._destroyeventlisteners">
+                            <a href="#plastick.js-plastick.prototype._destroyeventlisteners" class="permalink">#</a> Plastick._destroyEventListeners(state)
+                            <small>private method</small>
+                        </h2>
+
+                        <p>Removes event listeners registered to a game state.</p>
+
+
+                        <pre><code>this._destroyEventListeners(prevState);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>state</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The <code>Plastick.State</code> that was popped.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
+                        <h2 id="plastick.js-plastick.prototype._gameloop">
+                            <a href="#plastick.js-plastick.prototype._gameloop" class="permalink">#</a> Plastick._gameLoop()
+                            <small>private method</small>
+                        </h2>
+
+                        <p>The main game loop. The game is simulated using a fixed time step archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.</p>
+
+
                         
-                    </p>
-                    <p>The Facade object that will handle drawing this Plastick object.</p>
-
-                    
-
-                    
-
-                    
-
-                    <h3>Properties</h3>
-
-                    
-
-                    <p><b>stage</b> <code>Object</code></p>
-                    <p>Reference to the Facade object linked to this Plastick.</p>
-
-                    
-
-                    <p><b>states</b> <code>Object</code></p>
-                    <p>A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).</p>
-
-                    
-
-                    <p><b>startTime</b> <code>Float</code></p>
-                    <p>The time the game started running.</p>
-
-                    
-
-                    <p><b>currentTick</b> <code>Integer</code></p>
-                    <p>Current unit of game time. Each tick represents one execution of the game state's update() method.</p>
-
-                    
-
-                    <p><b>tickAlpha</b> <code>Float</code></p>
-                    <p>Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.</p>
-
-                    
-
-                    <p><b>isRunning</b> <code>Boolean</code></p>
-                    <p>True if the Plastick object is in a running state.</p>
-
-                    
-
-                    <p><b>data</b> <code>Object</code></p>
-                    <p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
-
-                    
-
-                    <p><b>GAME_TARGET_TPS</b> <code>Integer</code></p>
-                    <p>The target rate of game simulation, in ticks per second. Do not modify this while the game is running.</p>
-
-                    
-
-                    <p><b>GAME_TICK_CHOKE</b> <code>Integer</code></p>
-                    <p>The maximum number of ticks simulated per canvas frame.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="kd">var</span> <span class="nx">game</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Plastick</span><span class="p">(</span><span class="nx">stage</span><span class="p">);</span>
-</pre></div>
 
 
-                    
 
-                    <div class="code">
 
-                        <h3>Code</h3>
+                        <section class="returns">
 
-                        <div class="highlight"><pre><span class="kd">function</span> <span class="nx">Plastick</span><span class="p">(</span><span class="nx">stage</span><span class="p">)</span> <span class="p">{</span>
+                            <h3>Returns</h3>
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span> <span class="c1">// target game ticks per second</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TICK_CHOKE</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="c1">// max # of ticks per canvas frame</span>
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">stage</span> <span class="o">=</span> <span class="nx">stage</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">states</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tickTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">freezeOnBlur</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                            <p><code>Void</code></p>
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">_isRunning</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_freezeStart</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_frameTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_freezeLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-    <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">visibilityChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_freeze</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-
-<span class="p">}</span>
-</pre></div>
-
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Object</code> New Plastick object.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state">
+                            <a href="#plastick.js-plastick.state" class="permalink">#</a> Plastick.State()
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.start"><a href="#plastick.prototype.start" class="permalink">#</a>Plastick.start() </h2>
-
-                    <p>This will initialize the game with a pre-defined game state and start simulating the game.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>state</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The Plastick.State object to start simulating with.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">introState</span><span class="p">);</span>
-</pre></div>
+                        <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The user can redefine each one by passing it a callback method.</p>
 
 
-                    
+                        <pre><code>menuState = new State();
+</code></pre>
 
-                    <div class="code">
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="kd">var</span> <span class="nx">wasRunning</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">isRunning</span><span class="p">();</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">wasRunning</span><span class="p">)</span> <span class="p">{</span>
+                        <section class="returns">
 
-        <span class="k">this</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_isRunning</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">tickTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_frameTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">stage</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_gameLoop</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">wasRunning</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                            <h3>Returns</h3>
 
+
+
+                                    <p>
+                                            <code>Object</code>
+                                    </p>
+
+                                    <p>A new <code>Plastick.State</code> object.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Boolean</code> This returns <code>false</code> if no valid State is passed in or if the game was already running, otherwise it returns <code>true</code>.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.registerlistener">
+                            <a href="#plastick.js-plastick.state.prototype.registerlistener" class="permalink">#</a> Plastick.State.registerListener(element, type, callback)
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.stop"><a href="#plastick.prototype.stop" class="permalink">#</a>Plastick.stop() </h2>
-
-                    <p>This will immediately halt simulation of the game and clear the<br />entire state stack.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-</pre></div>
+                        <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.</p>
 
 
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stop</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="kd">var</span> <span class="nx">wasRunning</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">isRunning</span><span class="p">();</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">wasRunning</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_isRunning</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">stage</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_cleanup</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">wasRunning</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                        <pre><code>menuState.registerListener(document, 'click', function() {...});
+</code></pre>
 
 
-                    </div>
 
-                    <h3>Returns</h3>
+                        <section class="parameters">
 
-                    <p><code>Boolean</code> This returns <code>false</code> if the game was not already running, otherwise it returns <code>true</code>.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.isrunning"><a href="#plastick.prototype.isrunning" class="permalink">#</a>Plastick.isRunning() </h2>
-
-                    <p>Used to check if the game is running.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nx">game</span><span class="p">.</span><span class="nx">isRunning</span><span class="p">())</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The game is running!&#39;</span><span class="p">);</span> <span class="p">}</span>
-</pre></div>
+                            <h3>Parameters</h3>
 
 
-                    
+                                <p>
+                                    <b>element</b>
+                                        <code>Object</code>
+                                </p>
 
-                    <div class="code">
+                                <p>The object to register the listener for.</p>
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isRunning</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_isRunning</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                                <p>
+                                    <b>type</b>
+                                        <code>String</code>
+                                </p>
 
+                                <p>The event to register the listener for.</p>
+
+
+
+                                <p>
+                                    <b>callback</b>
+                                        <code>Function</code>
+                                </p>
+
+                                <p>The callback function to register.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Boolean</code> This returns <code>true</code> if <code>Plastick.start()</code> has been called and <code>Plastick.stop()</code> has not yet been called.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.deregisterlistener">
+                            <a href="#plastick.js-plastick.state.prototype.deregisterlistener" class="permalink">#</a> Plastick.State.deregisterListener(element, type[, callback])
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.pushstate"><a href="#plastick.prototype.pushstate" class="permalink">#</a>Plastick.pushState() </h2>
-
-                    <p>This will pause the current game state and start simulation of a new game state by doing the following: <ul><li>Pause simulation of the current state by calling its pause() method and destroying its event listeners</li><li>Push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul></p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>state</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The <code>Plastick.State</code> object to switch simulation to.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="nx">pauseState</span><span class="p">);</span>
-</pre></div>
+                        <p>This method allows the user to deregister an event listener with this state. If you want to deregister a specific callback, you <em>must</em> pass in a reference of the same copy that was registered eariler. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.</p>
 
 
-                    
+                        <pre><code>menuState.deregisterListener(document, 'click');
+</code></pre>
 
-                    <div class="code">
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">pushState</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+                        <section class="parameters">
 
-    <span class="kd">var</span> <span class="nx">prevState</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">();</span>
+                            <h3>Parameters</h3>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">prevState</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prevState</span><span class="p">.</span><span class="nx">_pause</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_destroyEventListeners</span><span class="p">(</span><span class="nx">prevState</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-        <span class="nx">state</span><span class="p">.</span><span class="nx">_init</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_createEventListeners</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
 
+                                <p>
+                                    <b>element</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>The object to deregister the listener(s) for.</p>
+
+
+
+                                <p>
+                                    <b>type</b>
+                                        <code>String</code>
+                                </p>
+
+                                <p>The event to deregister the listener(s) for.</p>
+
+
+
+                                <p>
+                                    <b>callback</b>
+                                        <code>Function</code>
+                                        <span class="label label-default">Optional</span>
+                                </p>
+
+                                <p>The specific callback function to deregister.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Boolean</code> This returns <code>false</code> if no valid <code>Plastick.State</code> is passed in, otherwise it returns <code>true</code>.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.init">
+                            <a href="#plastick.js-plastick.state.prototype.init" class="permalink">#</a> Plastick.State.init(func)
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.popstate"><a href="#plastick.prototype.popstate" class="permalink">#</a>Plastick.popState() </h2>
-
-                    <p>This will end the current game state and resume simulation of the previous game state by doing the following:<ul><li>End simulation of the current state by calling its <code>cleanup()</code> method and destroying its event listeners</li><li>Pop the current state off the state stack, making the prior state the current state</li><li>Call the prior state's <code>resume()</code> method and create its event listeners</li></ul>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">popState</span><span class="p">();</span>
-</pre></div>
+                        <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
 
 
-                    
+                        <pre><code>menuState.init(function() {...});
+</code></pre>
 
-                    <div class="code">
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">popState</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                        <section class="parameters">
 
-    <span class="kd">var</span> <span class="nx">prevState</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">pop</span><span class="p">(),</span>
-        <span class="nx">state</span><span class="p">;</span>
+                            <h3>Parameters</h3>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">prevState</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prevState</span><span class="p">.</span><span class="nx">_cleanup</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_destroyEventListeners</span><span class="p">(</span><span class="nx">prevState</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">();</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">state</span><span class="p">.</span><span class="nx">_resume</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_createEventListeners</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">prevState</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
 
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
+
+                                <p>The function to use for the <code>init()</code> callback.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Object</code> This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack, otherwise this returns <code>true</code>.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.cleanup">
+                            <a href="#plastick.js-plastick.state.prototype.cleanup" class="permalink">#</a> Plastick.State.cleanup(func)
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.changestate"><a href="#plastick.prototype.changestate" class="permalink">#</a>Plastick.changeState() </h2>
-
-                    <p>This will redirect simulation from the current game state to a new game state by doing the following:<ul><li>End simulation of the current state by calling its cleanup() method and destroying its event listeners</li><li>Pop the current state off the state stack and push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul>If calling this method empties the state stack, Plastick.stop() will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>state</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The <code>Plastick.State</code> object to switch simulation to.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">changeState</span><span class="p">(</span><span class="nx">menuState</span><span class="p">);</span>
-</pre></div>
+                        <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
 
 
-                    
+                        <pre><code>menuState.cleanup(function() {...});
+</code></pre>
 
-                    <div class="code">
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">changeState</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+                        <section class="parameters">
 
-    <span class="kd">var</span> <span class="nx">prevState</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
+                            <h3>Parameters</h3>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">prevState</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prevState</span><span class="p">.</span><span class="nx">_cleanup</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_destroyEventListeners</span><span class="p">(</span><span class="nx">prevState</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-        <span class="nx">state</span><span class="p">.</span><span class="nx">_init</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_createEventListeners</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">prevState</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">state</span> <span class="k">instanceof</span> <span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
 
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
+
+                                <p>The function to use for the <code>cleanup()</code> callback.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Object</code> This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack or if no valid <code>Plastick.State</code> is passed in, otherwise this returns <code>true</code>.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.update">
+                            <a href="#plastick.js-plastick.state.prototype.update" class="permalink">#</a> Plastick.State.update(func)
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.currentstate"><a href="#plastick.prototype.currentstate" class="permalink">#</a>Plastick.currentState() </h2>
-
-                    <p>This returns the State currently being simulated.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">currentState</span><span class="p">();</span>
-</pre></div>
+                        <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
 
 
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">currentState</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
-<span class="p">};</span>
-</pre></div>
+                        <pre><code>menuState.update(function() {...});
+</code></pre>
 
 
-                    </div>
 
-                    <h3>Returns</h3>
+                        <section class="parameters">
 
-                    <p><code>Object</code> Current game state, as a <code>Plastick.State</code> object.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-private">
-
-                    <h2 id="plastick.prototype.cleanup"><a href="#plastick.prototype.cleanup" class="permalink">#</a>Plastick._cleanup() <span class="label label-default">private</span></h2>
-
-                    <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">_cleanup</span><span class="p">();</span>
-</pre></div>
+                            <h3>Parameters</h3>
 
 
-                    
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
 
-                    <div class="code">
+                                <p>The function to use for the <code>update()</code> callback.</p>
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_cleanup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
-    <span class="k">while</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">popState</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                        </section>
 
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>true</code> </p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.draw">
+                            <a href="#plastick.js-plastick.state.prototype.draw" class="permalink">#</a> Plastick.State.draw(func)
+                        </h2>
 
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.gametime"><a href="#plastick.prototype.gametime" class="permalink">#</a>Plastick.gameTime() </h2>
-
-                    <p>This returns the number of milliseconds that has passed in the game. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">game</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">();</span>
-</pre></div>
+                        <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick's Facade object.</p>
 
 
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">gameTime</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="k">return</span> <span class="nb">window</span><span class="p">.</span><span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">_freezeLength</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                        <pre><code>menuState.draw(function() {...});
+</code></pre>
 
 
-                    </div>
 
-                    <h3>Returns</h3>
+                        <section class="parameters">
 
-                    <p><code>Float</code> The number of milliseconds that have passed since <code>Plastick.start()</code> was called, not including "frozen" time (blurred focus).</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.prototype.lerp"><a href="#plastick.prototype.lerp" class="permalink">#</a>Plastick.lerp() </h2>
-
-                    <p>Performs a linear interpolation between two numeric values using Plastick.tickAlpha.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>before</b>
-                        <code>Float</code>
-                        
-                    </p>
-                    <p>The "before" value.</p>
-
-                    
-
-                    <p>
-                        <b>after</b>
-                        <code>Float</code>
-                        
-                    </p>
-                    <p>The "after" value.</p>
-
-                    
-
-                    <p>
-                        <b>alpha</b>
-                        <code>Float</code>
-                        
-                        <span class="label label-default">Optional</span>
-                        
-                    </p>
-                    <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">game</span><span class="p">.</span><span class="nx">lerp</span><span class="p">(</span><span class="nx">sprite</span><span class="p">.</span><span class="nx">prevPosition</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">sprite</span><span class="p">.</span><span class="nx">currPosition</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span>
-</pre></div>
+                            <h3>Parameters</h3>
 
 
-                    
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
 
-                    <div class="code">
+                                <p>The function to use for the <code>draw()</code> callback.</p>
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">lerp</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">before</span><span class="p">,</span> <span class="nx">after</span><span class="p">,</span> <span class="nx">alpha</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">alpha</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="p">(</span><span class="nx">after</span> <span class="o">-</span> <span class="nx">before</span><span class="p">)</span> <span class="o">*</span> <span class="nx">alpha</span> <span class="o">+</span> <span class="nx">before</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="p">(</span><span class="nx">after</span> <span class="o">-</span> <span class="nx">before</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">+</span> <span class="nx">before</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
+                        </section>
 
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>Float</code> The result of the linear interpolation.</p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.pause">
+                            <a href="#plastick.js-plastick.state.prototype.pause" class="permalink">#</a> Plastick.State.pause(func)
+                        </h2>
 
-                
-
-                <div class="method scope-private">
-
-                    <h2 id="plastick.prototype.freeze"><a href="#plastick.prototype.freeze" class="permalink">#</a>Plastick._freeze() <span class="label label-default">private</span></h2>
-
-                    <p>Freezes or unfreezes the game simulation (depending on the "blur" state of the web page when it's called). The example code shows how Plastick uses this method.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">visibilityChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_freeze</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</pre></div>
+                        <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
 
 
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_freeze</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="c1">// freeze game when window blurs</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">freezeOnBlur</span> <span class="o">&amp;&amp;</span> <span class="nb">document</span><span class="p">[</span><span class="nx">hidden</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">isRunning</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_freezeStart</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_destroyEventListeners</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">());</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">freezeOnBlur</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">document</span><span class="p">[</span><span class="nx">hidden</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">isRunning</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_freezeLength</span> <span class="o">+=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">_freezeStart</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_freezeStart</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">_createEventListeners</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">());</span>
-    <span class="p">}</span>
-<span class="p">};</span>
-</pre></div>
+                        <pre><code>menuState.pause(function() {...});
+</code></pre>
 
 
-                    </div>
 
-                    <h3>Returns</h3>
+                        <section class="parameters">
 
-                    <p><code>void</code> </p>
-
-                </div>
-
-                
-
-                <div class="method scope-private">
-
-                    <h2 id="plastick.prototype.createeventlisteners"><a href="#plastick.prototype.createeventlisteners" class="permalink">#</a>Plastick._createEventListeners() <span class="label label-default">private</span></h2>
-
-                    <p>Creates event listeners registered to a game state.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>state</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The <code>Plastick.State</code> that is now current.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="k">this</span><span class="p">.</span><span class="nx">_createEventListeners</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
-</pre></div>
+                            <h3>Parameters</h3>
 
 
-                    
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
 
-                    <div class="code">
+                                <p>The function to use for the <code>pause()</code> callback.</p>
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_createEventListeners</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="nx">state</span><span class="p">.</span><span class="nx">listeners</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">listener</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">listener</span><span class="p">.</span><span class="nx">eventType</span><span class="p">,</span> <span class="nx">listener</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</pre></div>
+                        </section>
 
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>void</code> </p>
+                    <div class="method scope-public">
 
-                </div>
+                        <h2 id="plastick.js-plastick.state.prototype.resume">
+                            <a href="#plastick.js-plastick.state.prototype.resume" class="permalink">#</a> Plastick.State.resume(func)
+                        </h2>
 
-                
-
-                <div class="method scope-private">
-
-                    <h2 id="plastick.prototype.destroyeventlisteners"><a href="#plastick.prototype.destroyeventlisteners" class="permalink">#</a>Plastick._destroyEventListeners() <span class="label label-default">private</span></h2>
-
-                    <p>Removes event listeners registered to a game state.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>state</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The <code>Plastick.State</code> that was popped.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="k">this</span><span class="p">.</span><span class="nx">_destroyEventListeners</span><span class="p">(</span><span class="nx">prevState</span><span class="p">);</span>
-</pre></div>
+                        <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
 
 
-                    
+                        <pre><code>menuState.resume(function() {...});
+</code></pre>
 
-                    <div class="code">
 
-                        <h3>Code</h3>
 
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_destroyEventListeners</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+                        <section class="parameters">
 
-    <span class="nx">state</span><span class="p">.</span><span class="nx">listeners</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">listener</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="nx">listener</span><span class="p">.</span><span class="nx">eventType</span><span class="p">,</span> <span class="nx">listener</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</pre></div>
+                            <h3>Parameters</h3>
 
+
+                                <p>
+                                    <b>func</b>
+                                        <code>Function</code>
+                                </p>
+
+                                <p>The function to use for the <code>resume()</code> callback.</p>
+
+
+
+                        </section>
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Function</code>
+                                    </p>
+
+                                    <p>The function that was registered.</p>
+
+
+
+
+                        </section>
 
                     </div>
 
-                    <h3>Returns</h3>
 
-                    <p><code>void</code> </p>
-
-                </div>
-
-                
-
-                <div class="method scope-private">
-
-                    <h2 id="plastick.prototype.gameloop"><a href="#plastick.prototype.gameloop" class="permalink">#</a>Plastick._gameLoop() <span class="label label-default">private</span></h2>
-
-                    <p>The main game loop. The game is simulated using a fixed time step archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_gameLoop</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="kd">var</span> <span class="nx">ticksUpdated</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">_frameTime</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">();</span>
-    <span class="k">while</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_frameTime</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">&amp;&amp;</span>
-            <span class="nx">ticksUpdated</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TICK_CHOKE</span><span class="p">)</span> <span class="p">{</span>
-
-        <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="nx">ticksUpdated</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">().</span><span class="nx">_update</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">tickTime</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tickAlpha</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">gameTime</span><span class="p">()</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">GAME_TARGET_TPS</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentTick</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">currentState</span><span class="p">().</span><span class="nx">_draw</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-<span class="p">};</span>
-
-<span class="c1">// Plastick.State //////////////////////////////////////////////////////////</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>void</code> </p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state"><a href="#plastick.state" class="permalink">#</a>Plastick.State() </h2>
-
-                    <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The user can redefine each one by passing it a callback method.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">State</span><span class="p">();</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">_init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_cleanup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_update</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_draw</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_pause</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_resume</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">listeners</span> <span class="o">=</span> <span class="p">[];</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Object</code> A new <code>Plastick.State</code> object.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.registerlistener"><a href="#plastick.state.prototype.registerlistener" class="permalink">#</a>Plastick.State.registerListener() </h2>
-
-                    <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>element</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The object to register the listener for.</p>
-
-                    
-
-                    <p>
-                        <b>type</b>
-                        <code>String</code>
-                        
-                    </p>
-                    <p>The event to register the listener for.</p>
-
-                    
-
-                    <p>
-                        <b>callback</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The callback function to register.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">registerListener</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">registerListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">listeners</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
-        <span class="nx">element</span><span class="o">:</span> <span class="nx">element</span><span class="p">,</span>
-        <span class="nx">eventType</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span>
-        <span class="nx">callback</span><span class="o">:</span> <span class="nx">callback</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>void</code> </p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.deregisterlistener"><a href="#plastick.state.prototype.deregisterlistener" class="permalink">#</a>Plastick.State.deregisterListener() </h2>
-
-                    <p>This method allows the user to deregister an event listener with this state. If you want to deregister a specific callback, you <em>must</em> pass in a reference of the same copy that was registered eariler. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>element</b>
-                        <code>Object</code>
-                        
-                    </p>
-                    <p>The object to deregister the listener(s) for.</p>
-
-                    
-
-                    <p>
-                        <b>type</b>
-                        <code>String</code>
-                        
-                    </p>
-                    <p>The event to deregister the listener(s) for.</p>
-
-                    
-
-                    <p>
-                        <b>callback</b>
-                        <code>Function</code>
-                        
-                        <span class="label label-default">Optional</span>
-                        
-                    </p>
-                    <p>The specific callback function to deregister.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">deregisterListener</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">);</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">deregisterListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="kd">var</span> <span class="nx">oldListeners</span><span class="p">;</span>
-
-    <span class="nx">oldListeners</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">listeners</span><span class="p">.</span><span class="nx">slice</span><span class="p">();</span>
-    <span class="nx">oldListeners</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">listener</span><span class="p">.</span><span class="nx">element</span> <span class="o">===</span> <span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">listener</span><span class="p">.</span><span class="nx">eventType</span> <span class="o">===</span> <span class="nx">type</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">listener</span><span class="p">.</span><span class="nx">callback</span> <span class="o">===</span> <span class="nx">callback</span> <span class="o">||</span> <span class="nx">callback</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">listeners</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>void</code> </p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.init"><a href="#plastick.state.prototype.init" class="permalink">#</a>Plastick.State.init() </h2>
-
-                    <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>init()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_init</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_init</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.cleanup"><a href="#plastick.state.prototype.cleanup" class="permalink">#</a>Plastick.State.cleanup() </h2>
-
-                    <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>cleanup()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">cleanup</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">cleanup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cleanup</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cleanup</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.update"><a href="#plastick.state.prototype.update" class="permalink">#</a>Plastick.State.update() </h2>
-
-                    <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>update()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_update</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_update</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.draw"><a href="#plastick.state.prototype.draw" class="permalink">#</a>Plastick.State.draw() </h2>
-
-                    <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick's Facade object.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>draw()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">draw</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_draw</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_draw</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.pause"><a href="#plastick.state.prototype.pause" class="permalink">#</a>Plastick.State.pause() </h2>
-
-                    <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>pause()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">pause</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">pause</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pause</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pause</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
-
-                <div class="method scope-public">
-
-                    <h2 id="plastick.state.prototype.resume"><a href="#plastick.state.prototype.resume" class="permalink">#</a>Plastick.State.resume() </h2>
-
-                    <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
-
-                    
-
-                    <h3>Parameters</h3>
-
-                    
-
-                    <p>
-                        <b>func</b>
-                        <code>Function</code>
-                        
-                    </p>
-                    <p>The function to use for the <code>resume()</code> callback.</p>
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    
-
-                    <h3>Examples</h3>
-
-                    <div class="highlight"><pre><span class="nx">menuState</span><span class="p">.</span><span class="nx">resume</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{...});</span>
-</pre></div>
-
-
-                    
-
-                    <div class="code">
-
-                        <h3>Code</h3>
-
-                        <div class="highlight"><pre><span class="nx">Plastick</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">resume</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">func</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">_resume</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span> <span class="p">}</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_resume</span><span class="p">;</span>
-<span class="p">};</span>
-</pre></div>
-
-
-                    </div>
-
-                    <h3>Returns</h3>
-
-                    <p><code>Function</code> The function that was registered.</p>
-
-                </div>
-
-                
 
             </div>
 
@@ -1678,58 +1609,11 @@
 
     <div class="container">
 
-        <p>Documentation generated with <a href="https://github.com/visionmedia/dox">dox</a> and <a href="https://github.com/neogeek/doxdox">doxdox</a>.
+        <p>Documentation generated with <a href="https://github.com/neogeek/doxdox">doxdox</a>.</p>
 
     </div>
 
 </footer>
-
-
-
-<script src="http://cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js"></script>
-<script>
-
-(function () {
-
-    var hash = window.location.hash,
-        $hash_elem = $('[id="' + hash.replace(/#/, '') + '"]'),
-        $code_block = $('.code'),
-        $scope_private = $('.scope-private'),
-        $toggle_code_blocks = $('.toggle-code-blocks')
-        $toggle_private = $('.toggle-private');
-
-    $toggle_code_blocks.on('click', function () {
-
-        if ($toggle_code_blocks.is(':checked')) {
-            $code_block.show();
-        } else {
-            $code_block.hide();
-        }
-
-    });
-
-    $toggle_private.on('click', function () {
-
-        if ($toggle_private.is(':checked')) {
-            $scope_private.show();
-        } else {
-            $scope_private.hide();
-        }
-
-    });
-
-    $code_block.hide();
-    $scope_private.hide();
-
-    if ($hash_elem.length && !$hash_elem.is(':visible')) {
-
-        $toggle_private.trigger('click');
-
-    }
-
-}());
-
-</script>
 
 </body>
 </html>
