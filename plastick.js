@@ -76,6 +76,14 @@
         this._frameTime = 0;
         this._freezeLength = 0;
 
+        this._debugMode = false;
+        this._debugStopGameEvent = (function (e) {
+            if (e.keyCode === 32 && e.shiftKey) {
+                e.preventDefault();
+                this.stop();
+            }
+        }).bind(this);
+
         document.addEventListener(visibilityChange, this._freeze.bind(this));
 
     }
@@ -98,12 +106,20 @@
 
         if (state instanceof Plastick.State && !wasRunning) {
 
-            this.pushState(state);
+            this.states.push(state);
+            state._init(this);
+            this._createEventListeners(state);
+
             this._isRunning = true;
             this.startTime = window.performance.now();
             this.tickTime = 0;
             this._frameTime = 0;
             this.stage.draw(this._gameLoop.bind(this));
+
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Game started (' + this.currentState().name + ')');
+            }
+
             return true;
         }
         return state instanceof Plastick.State && !this.wasRunning;
@@ -129,6 +145,10 @@
             this._isRunning = false;
             this.stage.stop();
             this._cleanup();
+
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Game stopped');
+            }
         }
         return wasRunning;
     };
@@ -169,14 +189,17 @@
 
         var prevState = this.currentState();
 
-        if (prevState) {
+        if (prevState && state instanceof Plastick.State) {
             prevState._pause(this);
             this._destroyEventListeners(prevState);
-        }
-        if (state instanceof Plastick.State) {
+
             this.states.push(state);
             state._init(this);
             this._createEventListeners(state);
+
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Pushed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+            }
         }
         return state instanceof Plastick.State;
     };
@@ -212,7 +235,13 @@
         if (state) {
             state._resume(this);
             this._createEventListeners(state);
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Popped state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+            }
         } else {
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Popped state (' + prevState.name + ' -> [empty])');
+            }
             this.stop();
         }
         return prevState !== undefined;
@@ -239,16 +268,19 @@
 
     Plastick.prototype.changeState = function (state) {
 
-        var prevState = this.states.pop();
+        var prevState = this.currentState();
 
-        if (prevState) {
+        if (prevState && state instanceof Plastick.State) {
+            this.states.pop();
             prevState._cleanup(this);
             this._destroyEventListeners(prevState);
-        }
-        if (state instanceof Plastick.State) {
+
             this.states.push(state);
             state._init(this);
             this._createEventListeners(state);
+            if (this._debugMode) {
+                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Changed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+            }
         }
         return prevState !== undefined && state instanceof Plastick.State;
     };
@@ -295,6 +327,26 @@
             alpha = this.tickAlpha;
         }
         return (after - before) * alpha + before;
+    };
+
+    /**
+     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable console.info() calls to display state changes.
+     *
+     * '''
+     * game.setDebug(true)
+     * '''
+     *
+     */
+
+    Plastick.prototype.setDebug = function (toggle) {
+
+        if (toggle === true && this._debugMode === false) {
+            this._debugMode = true;
+            document.addEventListener('keydown', this._debugStopGameEvent);
+        } else if (toggle === false && this._debugMode === true) {
+            this._debugMode = false;
+            document.removeEventListener('keydown', this._debugStopGameEvent);
+        }
     };
 
     /**
