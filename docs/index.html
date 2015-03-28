@@ -287,6 +287,11 @@ pre .hljs {
                         </li>
 
 
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.setdebug" title="Plastick.setDebug">Plastick.setDebug</a>
+                        </li>
+
+
                         <li class="scope-private">
                             <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
                         </li>
@@ -469,6 +474,15 @@ pre .hljs {
                                 </p>
 
                                 <p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
+
+
+
+                                <p>
+                                    <b>methods</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
 
 
 
@@ -940,6 +954,36 @@ Note that this does not terminate execution of the current game tick. Since simu
                     </div>
 
 
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.setdebug">
+                            <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a> Plastick.setDebug()
+                        </h2>
+
+                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable console.info() calls to display state changes.</p>
+
+
+                        <p>'''
+game.setDebug(true)
+'''</p>
+
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
+
+                    </div>
+
+
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._cleanup">
@@ -1144,16 +1188,60 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state">
-                            <a href="#plastick.js-plastick.state" class="permalink">#</a> Plastick.State()
+                            <a href="#plastick.js-plastick.state" class="permalink">#</a> Plastick.State([name])
                         </h2>
 
-                        <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The user can redefine each one by passing it a callback method.</p>
+                        <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for the six definable methods is to do nothing. The user can redefine each one by passing it a callback method.</p>
 
 
                         <pre><code>menuState = <span class="hljs-keyword">new</span> State();
 </code></pre>
 
 
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>name</b>
+                                        <code>String</code>
+                                        <span class="label label-default">Optional</span>
+                                </p>
+
+                                <p>A label for the new state (useful when debugging).</p>
+
+
+
+                        </section>
+
+
+
+                        <section class="property">
+
+                            <h3>Properties</h3>
+
+
+                                <p>
+                                    <b>data</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>A generic object which the user can store any state-related data in.</p>
+
+
+
+                                <p>
+                                    <b>methods</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>A generic object which the user can store any state-related methods in.</p>
+
+
+
+                        </section>
 
 
 
