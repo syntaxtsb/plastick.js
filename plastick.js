@@ -32,7 +32,7 @@
         visibilityChange = 'webkitvisibilitychange';
     }
 
-    // Plastick v0.3.1 /////////////////////////////////////////////////////////
+    // Plastick v0.4.0-beta ////////////////////////////////////////////////////
 
     /**
      * Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
@@ -332,9 +332,9 @@
     /**
      * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable console.info() calls to display state changes.
      *
-     * '''
-     * game.setDebug(true)
-     * '''
+     * ```
+     * game.setDebug(true);
+     * ```
      *
      */
 
