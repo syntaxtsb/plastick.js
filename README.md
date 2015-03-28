@@ -1,3 +1,5 @@
+[![online documentation](http://doxdox.herokuapp.com/images/badge.svg)](http://doxdox.herokuapp.com/syntaxtsb/plastick.js)
+
 Plastick.js
 ===========
 
@@ -13,10 +15,26 @@ Installation
 * Install [Facade.js](https://github.com/facadejs/Facade.js), a 2D-canvas drawing library.
 * Place plastic.min.js into your project folder.
 
-
 Usage
 -----
 
-[![online documentation](http://doxdox.herokuapp.com/images/badge.svg)](http://doxdox.herokuapp.com/syntaxtsb/plastick.js)
+This is an example of a basic game loop, where the current game tick is recorded to the console on each tick (the canvas is not being used):
+```
+var stage = new Facade(document.querySelector('canvas')),
+    game = new Plastick(stage),
+    state = new Plastick.State();
 
-Documentation can also be accessed from the /docs folder.
+// register an event handler for stopping the game with the space bar
+state.registerListener(document, 'keydown', function (e) {
+    if (e.keyCode === 32) game.stop();
+});
+
+// register update loop for game state
+state.update(function () {
+
+    console.log(game.currentTick);
+});
+
+// start the game using the game state we defined
+game.start(state);
+```

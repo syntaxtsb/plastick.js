@@ -212,7 +212,7 @@ pre .hljs {
 
         <h1>
                 plastick.js
-            <small>0.3.0</small>
+            <small>0.3.1</small>
         </h1>
 
         <p>A lightweight, time-accurate game loop framework for Javascript.</p>
@@ -233,7 +233,7 @@ pre .hljs {
 
 
                     <li>
-                        <a href="#Plastick.js" class="file"><b>Plastick.js</b></a>
+                        <a href="#plastick.js" class="file"><b>plastick.js</b></a>
                         <ul>
 
 
@@ -277,11 +277,6 @@ pre .hljs {
                         </li>
 
 
-                        <li class="scope-private">
-                            <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
-                        </li>
-
-
                         <li class="scope-public">
                             <a href="#plastick.js-plastick.prototype.gametime" title="Plastick.gameTime">Plastick.gameTime</a>
                         </li>
@@ -289,6 +284,11 @@ pre .hljs {
 
                         <li class="scope-public">
                             <a href="#plastick.js-plastick.prototype.lerp" title="Plastick.lerp">Plastick.lerp</a>
+                        </li>
+
+
+                        <li class="scope-private">
+                            <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
                         </li>
 
 
@@ -369,7 +369,7 @@ pre .hljs {
             <div class="col-md-9">
 
 
-                <a id="Plastick.js" />
+                <a id="plastick.js" />
 
 
                     <div class="method scope-public">
@@ -381,7 +381,7 @@ pre .hljs {
                         <p>Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
 
 
-                        <pre><code>var game = new Plastick(stage);
+                        <pre><code><span class="hljs-keyword">var</span> game = <span class="hljs-keyword">new</span> Plastick(stage);
 </code></pre>
 
 
@@ -473,7 +473,7 @@ pre .hljs {
 
 
                                 <p>
-                                    <b>GAME_TARGET_TPS</b>
+                                    <b>TARGET_TPS</b>
                                         <code>Integer</code>
                                 </p>
 
@@ -482,7 +482,7 @@ pre .hljs {
 
 
                                 <p>
-                                    <b>GAME_TICK_CHOKE</b>
+                                    <b>TICK_CHOKE</b>
                                         <code>Integer</code>
                                 </p>
 
@@ -577,7 +577,8 @@ pre .hljs {
 entire state stack.</p>
 
 
-                        <pre><code>game.stop();
+                        <pre><code><span class="hljs-comment">// pressed Escape to quit the game</span>
+<span class="hljs-keyword">if</span> (pressedEsc) { game.stop(); }
 </code></pre>
 
 
@@ -613,7 +614,7 @@ entire state stack.</p>
                         <p>Used to check if the game is running.</p>
 
 
-                        <pre><code>if (game.isRunning()) { console.log('The game is running!'); }
+                        <pre><code><span class="hljs-keyword">if</span> (game.isRunning()) { <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The game is running!'</span>); }
 </code></pre>
 
 
@@ -646,10 +647,15 @@ entire state stack.</p>
                             <a href="#plastick.js-plastick.prototype.pushstate" class="permalink">#</a> Plastick.pushState(state)
                         </h2>
 
-                        <p>This will pause the current game state and start simulation of a new game state by doing the following: <ul><li>Pause simulation of the current state by calling its pause() method and destroying its event listeners</li><li>Push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul></p>
+                        <p>This will pause the current game state and start simulation of a new game state on the next game tick by doing the following: <ul><li>Calling the current state's pause() method and destroying its event listeners</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
+Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
 
 
-                        <pre><code>game.pushState(pauseState);
+                        <pre><code><span class="hljs-comment">// pause the game</span>
+<span class="hljs-keyword">if</span> (pauseButtonPressed) {
+    game.pushState(pauseState);
+    <span class="hljs-keyword">return</span>;
+}
 </code></pre>
 
 
@@ -699,10 +705,16 @@ entire state stack.</p>
                             <a href="#plastick.js-plastick.prototype.popstate" class="permalink">#</a> Plastick.popState()
                         </h2>
 
-                        <p>This will end the current game state and resume simulation of the previous game state by doing the following:<ul><li>End simulation of the current state by calling its <code>cleanup()</code> method and destroying its event listeners</li><li>Pop the current state off the state stack, making the prior state the current state</li><li>Call the prior state's <code>resume()</code> method and create its event listeners</li></ul>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
+                        <p>This will end the current game state and resume simulation of the previous game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack, making the prior state the current state</li><li>Calling the prior state's <code>resume()</code> method and creating its event listeners</li></ul>
+Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
 
 
-                        <pre><code>game.popState();
+                        <p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
+<pre><code><span class="hljs-comment">// unpause the game</span>
+<span class="hljs-keyword">if</span> (pauseButtonPressed) {
+    game.popState();
+    <span class="hljs-keyword">return</span>;
+}
 </code></pre>
 
 
@@ -716,7 +728,7 @@ entire state stack.</p>
 
 
                                     <p>
-                                            <code>Object</code>
+                                            <code>Boolean</code>
                                     </p>
 
                                     <p>This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack, otherwise this returns <code>true</code>.</p>
@@ -735,10 +747,16 @@ entire state stack.</p>
                             <a href="#plastick.js-plastick.prototype.changestate" class="permalink">#</a> Plastick.changeState(state)
                         </h2>
 
-                        <p>This will redirect simulation from the current game state to a new game state by doing the following:<ul><li>End simulation of the current state by calling its cleanup() method and destroying its event listeners</li><li>Pop the current state off the state stack and push the passed State onto the state stack, making it the current state</li><li>Call the new state's init() method and create its event listeners</li></ul>If calling this method empties the state stack, Plastick.stop() will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
+                        <p>This will redirect simulation from the current game state to a new game state on the next game tick by doing the following:<ul><li>Calling the current state's cleanup() method and destroying its event listeners</li><li>Popping the current state off the state stack and pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
+Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
 
 
-                        <pre><code>game.changeState(menuState);
+                        <p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
+<pre><code><span class="hljs-comment">// enter the main menu from the intro splash screen</span>
+<span class="hljs-keyword">if</span> (pressedAnyKey) {
+    game.changeState(menuState);
+    <span class="hljs-keyword">return</span>;
+}
 </code></pre>
 
 
@@ -769,7 +787,7 @@ entire state stack.</p>
 
 
                                     <p>
-                                            <code>Object</code>
+                                            <code>Boolean</code>
                                     </p>
 
                                     <p>This returns <code>false</code> if there is no <code>Plastick.State</code> to pop off the state stack or if no valid <code>Plastick.State</code> is passed in, otherwise this returns <code>true</code>.</p>
@@ -791,9 +809,7 @@ entire state stack.</p>
                         <p>This returns the State currently being simulated.</p>
 
 
-                        <pre><code>game.currentState();
-</code></pre>
-
+                        
 
 
 
@@ -808,43 +824,8 @@ entire state stack.</p>
                                             <code>Object</code>
                                     </p>
 
-                                    <p>Current game state, as a <code>Plastick.State</code> object.</p>
+                                    <p>The current game state, as a <code>Plastick.State</code> object.</p>
 
-
-
-
-                        </section>
-
-                    </div>
-
-
-                    <div class="method scope-private">
-
-                        <h2 id="plastick.js-plastick.prototype._cleanup">
-                            <a href="#plastick.js-plastick.prototype._cleanup" class="permalink">#</a> Plastick._cleanup()
-                            <small>private method</small>
-                        </h2>
-
-                        <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
-
-
-                        <pre><code>game._cleanup();</code></pre>
-
-
-
-
-
-                        <section class="returns">
-
-                            <h3>Returns</h3>
-
-
-
-                                    <p>
-                                            <code>true</code>
-                                    </p>
-
-                                    
 
 
 
@@ -862,9 +843,7 @@ entire state stack.</p>
                         <p>This returns the number of milliseconds that has passed in the game. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
 
 
-                        <pre><code>game.gameTime();
-</code></pre>
-
+                        
 
 
 
@@ -898,7 +877,7 @@ entire state stack.</p>
                         <p>Performs a linear interpolation between two numeric values using Plastick.tickAlpha.</p>
 
 
-                        <pre><code>var x = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
+                        <pre><code><span class="hljs-keyword">var</span> xPos = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
 </code></pre>
 
 
@@ -932,7 +911,7 @@ entire state stack.</p>
                                         <span class="label label-default">Optional</span>
                                 </p>
 
-                                <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha.</p>
+                                <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha. This should be a value between 0.0 and 1.0.</p>
 
 
 
@@ -963,6 +942,40 @@ entire state stack.</p>
 
                     <div class="method scope-private">
 
+                        <h2 id="plastick.js-plastick.prototype._cleanup">
+                            <a href="#plastick.js-plastick.prototype._cleanup" class="permalink">#</a> Plastick._cleanup()
+                            <small>private method</small>
+                        </h2>
+
+                        <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
+
+
+                        
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>true</code>
+                                    </p>
+
+                                    
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-private">
+
                         <h2 id="plastick.js-plastick.prototype._freeze">
                             <a href="#plastick.js-plastick.prototype._freeze" class="permalink">#</a> Plastick._freeze()
                             <small>private method</small>
@@ -971,7 +984,7 @@ entire state stack.</p>
                         <p>Freezes or unfreezes the game simulation (depending on the &quot;blur&quot; state of the web page when it's called). The example code shows how Plastick uses this method.</p>
 
 
-                        <pre><code>document.addEventListener(visibilityChange, this._freeze.bind(this));
+                        <pre><code><span class="hljs-built_in">document</span>.addEventListener(visibilityChange, <span class="hljs-keyword">this</span>._freeze.bind(<span class="hljs-keyword">this</span>));
 </code></pre>
 
 
@@ -1001,9 +1014,7 @@ entire state stack.</p>
                         <p>Creates event listeners registered to a game state.</p>
 
 
-                        <pre><code>this._createEventListeners(state);
-</code></pre>
-
+                        
 
 
                         <section class="parameters">
@@ -1048,9 +1059,7 @@ entire state stack.</p>
                         <p>Removes event listeners registered to a game state.</p>
 
 
-                        <pre><code>this._destroyEventListeners(prevState);
-</code></pre>
-
+                        
 
 
                         <section class="parameters">
@@ -1063,7 +1072,7 @@ entire state stack.</p>
                                         <code>Object</code>
                                 </p>
 
-                                <p>The <code>Plastick.State</code> that was popped.</p>
+                                <p>The <code>Plastick.State</code> that was popped from the state stack.</p>
 
 
 
@@ -1092,10 +1101,29 @@ entire state stack.</p>
                             <small>private method</small>
                         </h2>
 
-                        <p>The main game loop. The game is simulated using a fixed time step archtecture. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.GAME_TICK_CHOKE ticks per call.</p>
+                        <p>The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:</p>
 
 
-                        
+                        <pre><code><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+    <span class="hljs-keyword">var</span> ticksUpdated = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">this</span>._frameTime = <span class="hljs-keyword">this</span>.gameTime();
+    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._frameTime * <span class="hljs-keyword">this</span>.TARGET_TPS / <span class="hljs-number">1000</span> &gt; <span class="hljs-keyword">this</span>.currentTick &amp;&amp;
+            ticksUpdated &lt; <span class="hljs-keyword">this</span>.TICK_CHOKE) {
+        <span class="hljs-keyword">this</span>.currentTick += <span class="hljs-number">1</span>;
+        ticksUpdated += <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">this</span>.currentState()._update(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.tickTime = <span class="hljs-keyword">this</span>.gameTime();
+    }
+    <span class="hljs-comment">// skip draw if game was stopped (no state on the stack!)</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._isRunning) {
+        <span class="hljs-keyword">this</span>.tickAlpha = <span class="hljs-keyword">this</span>.gameTime() * <span class="hljs-keyword">this</span>.TARGET_TPS / <span class="hljs-number">1000</span> - <span class="hljs-keyword">this</span>.currentTick + <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">this</span>.currentState()._draw(<span class="hljs-keyword">this</span>);
+    }
+};
+</code></pre>
+
 
 
 
@@ -1122,7 +1150,7 @@ entire state stack.</p>
                         <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The user can redefine each one by passing it a callback method.</p>
 
 
-                        <pre><code>menuState = new State();
+                        <pre><code>menuState = <span class="hljs-keyword">new</span> State();
 </code></pre>
 
 
@@ -1158,7 +1186,7 @@ entire state stack.</p>
                         <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.</p>
 
 
-                        <pre><code>menuState.registerListener(document, 'click', function() {...});
+                        <pre><code>menuState.registerListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 
@@ -1222,7 +1250,7 @@ entire state stack.</p>
                         <p>This method allows the user to deregister an event listener with this state. If you want to deregister a specific callback, you <em>must</em> pass in a reference of the same copy that was registered eariler. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.</p>
 
 
-                        <pre><code>menuState.deregisterListener(document, 'click');
+                        <pre><code>menuState.deregisterListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>);
 </code></pre>
 
 
@@ -1287,7 +1315,7 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
 
 
-                        <pre><code>menuState.init(function() {...});
+                        <pre><code>menuState.init(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 
@@ -1340,7 +1368,7 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
 
 
-                        <pre><code>menuState.cleanup(function() {...});
+                        <pre><code>menuState.cleanup(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 
@@ -1393,7 +1421,7 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
 
 
-                        <pre><code>menuState.update(function() {...});
+                        <pre><code>menuState.update(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 
@@ -1446,7 +1474,11 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick's Facade object.</p>
 
 
-                        <pre><code>menuState.draw(function() {...});
+                        <pre><code>menuState.draw(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+    game.stage.clear();
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> e = <span class="hljs-number">0</span>; e &lt; entities.length; e += <span class="hljs-number">1</span>) {
+    }
+});
 </code></pre>
 
 
@@ -1499,7 +1531,7 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
 
 
-                        <pre><code>menuState.pause(function() {...});
+                        <pre><code>menuState.pause(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 
@@ -1552,7 +1584,7 @@ entire state stack.</p>
                         <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
 
 
-                        <pre><code>menuState.resume(function() {...});
+                        <pre><code>menuState.resume(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
 </code></pre>
 
 

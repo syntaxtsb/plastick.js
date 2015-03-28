@@ -6,10 +6,10 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        jslint: {
-            client: {
-                src: ['plastick.js'],
-                directives: {
+        jshint: {
+            target: {
+                src: ['plastick.js']
+                /*directives: {
                     nomen: true,
                     globals: {
                         'document': true,
@@ -18,11 +18,11 @@ module.exports = function (grunt) {
                         'require': true,
                         'window': true
                     }
-                }
+                }*/
             }
         },
         uglify: {
-            my_target: {
+            target: {
                 options: {
                     mangle: true,
                     report: 'gzip',
@@ -50,12 +50,12 @@ module.exports = function (grunt) {
         watch: {
             default: {
                 files: ['plastick.js'],
-                tasks: ['jslint', 'uglify', 'doxdox']
+                tasks: ['jshint', 'uglify', 'doxdox']
             }
         }
     });
 
-    grunt.registerTask('default', [ 'jslint', 'uglify', 'doxdox' ]);
+    grunt.registerTask('default', [ 'jshint', 'uglify', 'doxdox' ]);
     grunt.registerTask('test', [ 'jasmine' ]);
 
 };
