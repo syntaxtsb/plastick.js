@@ -48,6 +48,7 @@
      * @property {Float} tickAlpha Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
+     * @property {Object} methods A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Integer} TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
      * @property {Integer} TICK_CHOKE The maximum number of ticks simulated per canvas frame.
      * @param {Object} stage The Facade object that will handle drawing this Plastick object.
@@ -62,6 +63,7 @@
 
         this.stage = stage;
         this.data = {};
+        this.methods = {};
         this.states = [];
         this.startTime = null;
         this.currentTick = 0;
@@ -416,17 +418,20 @@
     // Plastick.State //////////////////////////////////////////////////////////
 
     /**
-     * This represents a game state (menu, pause screen, demo screen, etc). The default behavior for each method is to do nothing. The user can redefine each one by passing it a callback method.
+     * This represents a game state (menu, pause screen, demo screen, etc). The default behavior for the six definable methods is to do nothing. The user can redefine each one by passing it a callback method.
      *
      * ```
      * menuState = new State();
      * ```
      *
+     * @param {String} [name] A label for the new state (useful when debugging).
+     * @property {Object} data A generic object which the user can store any state-related data in.
+     * @property {Object} methods A generic object which the user can store any state-related methods in.
      * @return {Object} A new <code>Plastick.State</code> object.
      * @api public
      */
 
-    Plastick.State = function () {
+    Plastick.State = function (name) {
 
         this._init = function () { return undefined; };
         this._cleanup = function () { return undefined; };
@@ -434,7 +439,9 @@
         this._draw = function () { return undefined; };
         this._pause = function () { return undefined; };
         this._resume = function () { return undefined; };
+        this.name = name;
         this.data = {};
+        this.methods = {};
         this.listeners = [];
     };
 
