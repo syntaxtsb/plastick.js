@@ -35,13 +35,14 @@
     // Plastick v0.4.0-beta ////////////////////////////////////////////////////
 
     /**
-     * Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
+     * Create a Plastick object for your game by passing it a canvas object OR a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
      *
      * ```
      * var game = new Plastick(stage);
      * ```
      *
-     * @property {Object} stage Reference to the Facade object linked to this Plastick.
+     * @property {Object} stage Reference to the canvas object or Facade object linked to this Plastick.
+     * @property {Object} context Reference to the canvas rendering context.
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
      * @property {Float} startTime The time the game started running.
      * @property {Integer} currentTick Current unit of game time. Each tick represents one execution of the game state's update() method.
@@ -51,17 +52,20 @@
      * @property {Object} methods A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Integer} TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
      * @property {Integer} TICK_CHOKE The maximum number of ticks simulated per canvas frame.
-     * @param {Object} stage The Facade object that will handle drawing this Plastick object.
+     * @param {Object} stage The canvas object or Facade object that will handle drawing this Plastick object.
      * @return {Object} New Plastick object.
      * @api public
      */
 
-    function Plastick(stage) {
+    function Plastick(stage, hdpi) {
 
         this.TARGET_TPS = 30; // target game ticks per second
         this.TICK_CHOKE = 50; // max # of ticks per canvas frame
 
         this.stage = stage;
+        this.context = this.stage.getContext !== undefined ?
+            stage.getContext('2d') : this.stage.context;
+        this.HDPIDisplay = hdpi;
         this.data = {};
         this.methods = {};
         this.states = [];
@@ -86,6 +90,17 @@
 
         document.addEventListener(visibilityChange, this._freeze.bind(this));
 
+        // set HDPI scale
+        if (this.stage.getContext !== undefined && this.HDPIDisplay) {
+
+            this.HDPIDisplay = (typeof this.HDPIDisplay === 'number') ? this.HDPIDisplay : 2;
+
+            this.stage.setAttribute('style', 'width: ' + this.stage.width + 'px; height: ' + this.stage.height + 'px;');
+            this.stage.setAttribute('width', this.stage.width * this.HDPIDisplay);
+            this.stage.setAttribute('height', this.stage.height * this.HDPIDisplay);
+            this.context.scale(this.HDPIDisplay, this.HDPIDisplay);
+            this.stage.setAttribute('data-resized-for-hdpi', true);
+        }
     }
 
     /**
@@ -102,7 +117,9 @@
 
     Plastick.prototype.start = function (state) {
 
-        var wasRunning = this.isRunning();
+        var wasRunning = this.isRunning(),
+            canvasMode = this.stage.getContext !== undefined ?
+            'native canvas' : 'Facade';
 
         if (state instanceof Plastick.State && !wasRunning) {
 
@@ -114,10 +131,14 @@
             this.startTime = window.performance.now();
             this.tickTime = 0;
             this._frameTime = 0;
-            this.stage.draw(this._gameLoop.bind(this));
+            if (this.stage.getContext !== undefined) {
+                window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
+            } else {
+                this.stage.draw(this._gameLoop.bind(this));
+            }
 
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Game started (' + this.currentState().name + ')');
+                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
             }
 
             return true;
@@ -143,11 +164,11 @@
 
         if (wasRunning) {
             this._isRunning = false;
-            this.stage.stop();
+            if (this.stage.getContext === undefined) this.stage.stop();
             this._cleanup();
 
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Game stopped');
+                this.debug('Game stopped');
             }
         }
         return wasRunning;
@@ -198,7 +219,7 @@
             this._createEventListeners(state);
 
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Pushed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+                this.debug('Pushed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
         }
         return state instanceof Plastick.State;
@@ -236,11 +257,11 @@
             state._resume(this);
             this._createEventListeners(state);
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Popped state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+                this.debug('Popped state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
         } else {
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Popped state (' + prevState.name + ' -> [empty])');
+                this.debug('Popped state (' + prevState.name + ' -> [empty])');
             }
             this.stop();
         }
@@ -279,7 +300,7 @@
             state._init(this);
             this._createEventListeners(state);
             if (this._debugMode) {
-                console.info(Math.round(this.gameTime() * 100) / 100, this.currentTick, 'Changed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
+                this.debug('Changed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
         }
         return prevState !== undefined && state instanceof Plastick.State;
@@ -329,8 +350,20 @@
         return (after - before) * alpha + before;
     };
 
+   Plastick.prototype.width = function () {
+
+       if (this.HDPIDisplay) return this.stage.width / this.HDPIDisplay;
+       else return this.stage.width;
+   };
+
+   Plastick.prototype.height = function () {
+
+       if (this.HDPIDisplay) return this.stage.height / this.HDPIDisplay;
+       else return this.stage.height;
+   };
+
     /**
-     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable console.info() calls to display state changes.
+     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable automatic console.info() calls to display state changes.
      *
      * ```
      * game.setDebug(true);
@@ -420,7 +453,7 @@
     };
 
     /**
-     * The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:
+     * The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame()). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:
      *
      * ```
      * function () {
@@ -449,11 +482,13 @@
 
     Plastick.prototype._gameLoop = function () {
 
-        var ticksUpdated = 0;
+        var ticksUpdated = 0,
+            sameState = this.currentState();
 
         this._frameTime = this.gameTime();
         while (this._frameTime * this.TARGET_TPS / 1000 > this.currentTick &&
-                ticksUpdated < this.TICK_CHOKE) {
+                ticksUpdated < this.TICK_CHOKE &&
+                this._isRunning) {
 
             this.currentTick += 1;
             ticksUpdated += 1;
@@ -461,10 +496,23 @@
             this.tickTime = this.gameTime();
         }
         // skip draw if game was stopped (no state on the stack!)
-        if (this._isRunning) {
+        if (this._isRunning && this.currentState() === sameState) {
             this.tickAlpha = this.gameTime() * this.TARGET_TPS / 1000 - this.currentTick + 1;
             this.currentState()._draw(this);
         }
+    };
+
+    Plastick.prototype._requestAnimationFrame = function() {
+
+        this._gameLoop();
+        if (this._isRunning)
+            return window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
+    };
+
+    Plastick.prototype.debug = function (info) {
+
+        console.info('Plastick (' + this.currentTick + ' @ ' +
+            (+this.gameTime() / 1000).toFixed(3) + 's): ' + info);
     };
 
     // Plastick.State //////////////////////////////////////////////////////////
@@ -600,7 +648,7 @@
     };
 
     /**
-     * Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick's Facade object.
+     * Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick (or Facade if it was passed to Plastick upon construction).
      *
      * ```
      * menuState.draw(function() {
