@@ -124,6 +124,9 @@
         if (state instanceof Plastick.State && !wasRunning) {
 
             this.states.push(state);
+            if (this._debugMode) {
+                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
+            }
             state._init(this);
             this._createEventListeners(state);
 
@@ -135,10 +138,6 @@
                 window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
             } else {
                 this.stage.draw(this._gameLoop.bind(this));
-            }
-
-            if (this._debugMode) {
-                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
             }
 
             return true;
@@ -215,12 +214,11 @@
             this._destroyEventListeners(prevState);
 
             this.states.push(state);
-            state._init(this);
-            this._createEventListeners(state);
-
             if (this._debugMode) {
                 this.debug('Pushed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
+            state._init(this);
+            this._createEventListeners(state);
         }
         return state instanceof Plastick.State;
     };
@@ -254,11 +252,11 @@
         }
         state = this.currentState();
         if (state) {
-            state._resume(this);
-            this._createEventListeners(state);
             if (this._debugMode) {
                 this.debug('Popped state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
+            state._resume(this);
+            this._createEventListeners(state);
         } else {
             if (this._debugMode) {
                 this.debug('Popped state (' + prevState.name + ' -> [empty])');
@@ -297,11 +295,11 @@
             this._destroyEventListeners(prevState);
 
             this.states.push(state);
-            state._init(this);
-            this._createEventListeners(state);
             if (this._debugMode) {
                 this.debug('Changed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
+            state._init(this);
+            this._createEventListeners(state);
         }
         return prevState !== undefined && state instanceof Plastick.State;
     };

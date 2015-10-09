@@ -115,10 +115,10 @@ pre .hljs {
 
     var protocol = w.location.protocol === 'file:' ? 'http:' : w.location.protocol,
         resource = [
-            '//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css',
-            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css',
-            '//code.jquery.com/jquery-2.1.3.js',
-            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js'
+            '//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
+            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/github.min.css',
+            '//code.jquery.com/jquery-2.1.4.js',
+            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js'
         ];
 
     function loadResource(url) {
@@ -212,7 +212,7 @@ pre .hljs {
 
         <h1>
                 plastick.js
-            <small>0.4.0-beta</small>
+            <small>0.4.1-beta</small>
         </h1>
 
         <p>A lightweight, time-accurate game loop framework for Javascript.</p>
@@ -362,6 +362,11 @@ pre .hljs {
                         </li>
 
 
+                        <li class="scope-public">
+                            <a href="#plastick.js-if" title="if">if</a>
+                        </li>
+
+
                         </ul>
 
                     </li>
@@ -383,7 +388,7 @@ pre .hljs {
                             <a href="#plastick.js-plastick" class="permalink">#</a> Plastick(stage)
                         </h2>
 
-                        <p>Create a Plastick object for your game by passing it a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
+                        <p>Create a Plastick object for your game by passing it a canvas object OR a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
 
 
                         <pre><code><span class="hljs-keyword">var</span> game = <span class="hljs-keyword">new</span> Plastick(stage);
@@ -401,7 +406,7 @@ pre .hljs {
                                         <code>Object</code>
                                 </p>
 
-                                <p>The Facade object that will handle drawing this Plastick object.</p>
+                                <p>The canvas object or Facade object that will handle drawing this Plastick object.</p>
 
 
 
@@ -419,7 +424,16 @@ pre .hljs {
                                         <code>Object</code>
                                 </p>
 
-                                <p>Reference to the Facade object linked to this Plastick.</p>
+                                <p>Reference to the canvas object or Facade object linked to this Plastick.</p>
+
+
+
+                                <p>
+                                    <b>context</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>Reference to the canvas rendering context.</p>
 
 
 
@@ -960,7 +974,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a> Plastick.setDebug()
                         </h2>
 
-                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable console.info() calls to display state changes.</p>
+                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable automatic console.info() calls to display state changes.</p>
 
 
                         <pre><code>game.setDebug(<span class="hljs-literal">true</span>);
@@ -1039,7 +1053,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1084,7 +1103,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1129,7 +1153,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1144,10 +1173,10 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <small>private method</small>
                         </h2>
 
-                        <p>The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame(), via Facade). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:</p>
+                        <p>The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame()). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:</p>
 
 
-                        <pre><code><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                        <pre><code><span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
     <span class="hljs-keyword">var</span> ticksUpdated = <span class="hljs-number">0</span>;
 
@@ -1176,7 +1205,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1273,7 +1307,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.</p>
 
 
-                        <pre><code>menuState.registerListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.registerListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1320,7 +1354,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1385,7 +1424,12 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <h3>Returns</h3>
 
 
-                            <p><code>Void</code></p>
+
+                                    <p>
+                                    </p>
+
+                                    
+
 
 
                         </section>
@@ -1402,7 +1446,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
 
 
-                        <pre><code>menuState.init(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.init(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1455,7 +1499,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
 
 
-                        <pre><code>menuState.cleanup(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.cleanup(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1508,7 +1552,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
 
 
-                        <pre><code>menuState.update(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.update(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1558,10 +1602,10 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.state.prototype.draw" class="permalink">#</a> Plastick.State.draw(func)
                         </h2>
 
-                        <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick's Facade object.</p>
+                        <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick (or Facade if it was passed to Plastick upon construction).</p>
 
 
-                        <pre><code>menuState.draw(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+                        <pre><code>menuState.draw(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     game.stage.clear();
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> e = <span class="hljs-number">0</span>; e &lt; entities.length; e += <span class="hljs-number">1</span>) {
     }
@@ -1618,7 +1662,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
 
 
-                        <pre><code>menuState.pause(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.pause(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1671,7 +1715,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                         <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
 
 
-                        <pre><code>menuState.resume(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{...});
+                        <pre><code>menuState.resume(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
 
@@ -1708,6 +1752,33 @@ Note that this does not terminate execution of the current game tick. Since simu
                                     <p>The function that was registered.</p>
 
 
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-if">
+                            <a href="#plastick.js-if" class="permalink">#</a> if()
+                        </h2>
+
+                        <p>AMD Support</p>
+
+
+                        
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
 
 
                         </section>
