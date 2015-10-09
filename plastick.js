@@ -123,17 +123,18 @@
 
         if (state instanceof Plastick.State && !wasRunning) {
 
-            this.states.push(state);
-            if (this._debugMode) {
-                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
-            }
-            state._init(this);
-            this._createEventListeners(state);
-
             this._isRunning = true;
             this.startTime = window.performance.now();
             this.tickTime = 0;
             this._frameTime = 0;
+
+            this.states.push(state);
+            if (this._debugMode) {
+                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
+            }
+            this._createEventListeners(state);
+            state._init(this);
+
             if (this.stage.getContext !== undefined) {
                 window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
             } else {
@@ -217,8 +218,9 @@
             if (this._debugMode) {
                 this.debug('Pushed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
-            state._init(this);
             this._createEventListeners(state);
+            state._init(this);
+
         }
         return state instanceof Plastick.State;
     };
@@ -255,8 +257,8 @@
             if (this._debugMode) {
                 this.debug('Popped state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
-            state._resume(this);
             this._createEventListeners(state);
+            state._resume(this);
         } else {
             if (this._debugMode) {
                 this.debug('Popped state (' + prevState.name + ' -> [empty])');
@@ -298,8 +300,8 @@
             if (this._debugMode) {
                 this.debug('Changed state (' + prevState.name + ' -> ' + this.currentState().name + ')');
             }
-            state._init(this);
             this._createEventListeners(state);
+            state._init(this);
         }
         return prevState !== undefined && state instanceof Plastick.State;
     };
