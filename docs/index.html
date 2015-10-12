@@ -292,6 +292,11 @@ pre .hljs {
                         </li>
 
 
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.debug" title="Plastick.debug">Plastick.debug</a>
+                        </li>
+
+
                         <li class="scope-private">
                             <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
                         </li>
@@ -505,7 +510,7 @@ pre .hljs {
                                         <code>Integer</code>
                                 </p>
 
-                                <p>The target rate of game simulation, in ticks per second. Do not modify this while the game is running.</p>
+                                <p>The target rate of game simulation, in ticks per second. Modifying this while the game is running may result in inaccurate simulation.</p>
 
 
 
@@ -865,13 +870,31 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.gametime">
-                            <a href="#plastick.js-plastick.prototype.gametime" class="permalink">#</a> Plastick.gameTime()
+                            <a href="#plastick.js-plastick.prototype.gametime" class="permalink">#</a> Plastick.gameTime([time])
                         </h2>
 
-                        <p>This returns the number of milliseconds that has passed in the game. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
+                        <p>This returns the number of milliseconds that have passed in the game. If a time argument is passed in (milliseconds since the page session started), this instead converts that time to the equivalent game time and returns the result. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
 
 
                         
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>time</b>
+                                        <code>Integer</code>
+                                        <span class="label label-default">Optional</span>
+                                </p>
+
+                                <p>A timestamp (time since beginning of session) to convert to game time.</p>
+
+
+
+                        </section>
 
 
 
@@ -886,7 +909,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                                             <code>Float</code>
                                     </p>
 
-                                    <p>The number of milliseconds that have passed since <code>Plastick.start()</code> was called, not including &quot;frozen&quot; time (blurred focus).</p>
+                                    <p>The number of milliseconds that have passed between now (or <code>time</code>) and the time <code>Plastick.start()</code> was called, not including &quot;frozen&quot; time (blurred focus).</p>
 
 
 
@@ -902,7 +925,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.prototype.lerp" class="permalink">#</a> Plastick.lerp(before, after[, alpha])
                         </h2>
 
-                        <p>Performs a linear interpolation between two numeric values using Plastick.tickAlpha.</p>
+                        <p>Performs a linear interpolation between two numeric values using <code>Plastick.tickAlpha</code>.</p>
 
 
                         <pre><code><span class="hljs-keyword">var</span> xPos = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
@@ -939,7 +962,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                                         <span class="label label-default">Optional</span>
                                 </p>
 
-                                <p>If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha. This should be a value between 0.0 and 1.0.</p>
+                                <p>If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0.</p>
 
 
 
@@ -974,12 +997,58 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a> Plastick.setDebug()
                         </h2>
 
-                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable automatic console.info() calls to display state changes.</p>
+                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>. It will also enable automatic <code>console.info()</code> calls to display state changes.</p>
 
 
                         <pre><code>game.setDebug(<span class="hljs-literal">true</span>);
 </code></pre>
 
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+                            <p><code>Void</code></p>
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.debug">
+                            <a href="#plastick.js-plastick.prototype.debug" class="permalink">#</a> Plastick.debug(info)
+                        </h2>
+
+                        <p>Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will only be output if debug mode is enabled.</p>
+
+
+                        <pre><code>game.debug(<span class="hljs-string">'Test message'</span>);
+</code></pre>
+
+
+
+                        <section class="parameters">
+
+                            <h3>Parameters</h3>
+
+
+                                <p>
+                                    <b>info</b>
+                                        <code>String</code>
+                                </p>
+
+                                <p>Text to be output to the console.</p>
+
+
+
+                        </section>
 
 
 

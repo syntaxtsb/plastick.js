@@ -50,7 +50,7 @@
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Object} methods A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.
-     * @property {Integer} TARGET_TPS The target rate of game simulation, in ticks per second. Do not modify this while the game is running.
+     * @property {Integer} TARGET_TPS The target rate of game simulation, in ticks per second. Modifying this while the game is running may result in inaccurate simulation.
      * @property {Integer} TICK_CHOKE The maximum number of ticks simulated per canvas frame.
      * @param {Object} stage The canvas object or Facade object that will handle drawing this Plastick object.
      * @return {Object} New Plastick object.
@@ -319,18 +319,20 @@
     };
 
     /**
-     * This returns the number of milliseconds that has passed in the game. Note that game time may be suspended whenever the containing browser tab is hidden.
+     * This returns the number of milliseconds that have passed in the game. If a time argument is passed in (milliseconds since the page session started), this instead converts that time to the equivalent game time and returns the result. Note that game time may be suspended whenever the containing browser tab is hidden.
      *
-     * @return {Float} The number of milliseconds that have passed since <code>Plastick.start()</code> was called, not including "frozen" time (blurred focus).
+     * @param {Integer} [time] A timestamp (time since beginning of session) to convert to game time.
+     * @return {Float} The number of milliseconds that have passed between now (or <code>time</code>) and the time <code>Plastick.start()</code> was called, not including "frozen" time (blurred focus).
      */
 
-    Plastick.prototype.gameTime = function () {
+    Plastick.prototype.gameTime = function (time) {
 
+        if (time) return time - this.startTime - this._freezeLength;
         return window.performance.now() - this.startTime - this._freezeLength;
     };
 
     /**
-     * Performs a linear interpolation between two numeric values using Plastick.tickAlpha.
+     * Performs a linear interpolation between two numeric values using <code>Plastick.tickAlpha</code>.
      *
      * ```
      * var xPos = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
@@ -338,7 +340,7 @@
      *
      * @param {Float} before The "before" value.
      * @param {Float} after The "after" value.
-     * @param {Float} [alpha] If provided, the values will be interpolated using this alpha instead of Plastick.tickAlpha. This should be a value between 0.0 and 1.0.
+     * @param {Float} [alpha] If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0.
      * @return {Float} The result of the linear interpolation.
      */
 
@@ -363,7 +365,7 @@
    };
 
     /**
-     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call Plastick.stop(). It will also enable automatic console.info() calls to display state changes.
+     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>. It will also enable automatic <code>console.info()</code> calls to display state changes.
      *
      * ```
      * game.setDebug(true);
@@ -380,6 +382,22 @@
             this._debugMode = false;
             document.removeEventListener('keydown', this._debugStopGameEvent);
         }
+    };
+
+    /**
+     * Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will only be output if debug mode is enabled.
+     *
+     * ```
+     * game.debug('Test message');
+     * ```
+     *
+     * @param {String} info Text to be output to the console.
+     */
+
+    Plastick.prototype.debug = function (info) {
+
+        console.info('Plastick (' + this.currentTick + ' @ ' +
+            (+this.gameTime() / 1000).toFixed(3) + 's): ' + info);
     };
 
     /**
@@ -507,12 +525,6 @@
         this._gameLoop();
         if (this._isRunning)
             return window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
-    };
-
-    Plastick.prototype.debug = function (info) {
-
-        console.info('Plastick (' + this.currentTick + ' @ ' +
-            (+this.gameTime() / 1000).toFixed(3) + 's): ' + info);
     };
 
     // Plastick.State //////////////////////////////////////////////////////////
