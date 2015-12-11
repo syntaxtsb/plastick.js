@@ -367,11 +367,6 @@ pre .hljs {
                         </li>
 
 
-                        <li class="scope-public">
-                            <a href="#plastick.js-if" title="if">if</a>
-                        </li>
-
-
                         </ul>
 
                     </li>
@@ -997,7 +992,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a> Plastick.setDebug()
                         </h2>
 
-                        <p>Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>. It will also enable automatic <code>console.info()</code> calls to display state changes.</p>
+                        <p>Toggles debug mode. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) it will enable automatic <code>console.info()</code> calls to display state changes.</p>
 
 
                         <pre><code>game.setDebug(<span class="hljs-literal">true</span>);
@@ -1026,7 +1021,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                             <a href="#plastick.js-plastick.prototype.debug" class="permalink">#</a> Plastick.debug(info)
                         </h2>
 
-                        <p>Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will only be output if debug mode is enabled.</p>
+                        <p>Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will be suppressed unless debug mode is enabled with <code>Plastick.setDebug(true)</code>.</p>
 
 
                         <pre><code>game.debug(<span class="hljs-string">'Test message'</span>);
@@ -1821,33 +1816,6 @@ Note that this does not terminate execution of the current game tick. Since simu
                                     <p>The function that was registered.</p>
 
 
-
-
-                        </section>
-
-                    </div>
-
-
-                    <div class="method scope-public">
-
-                        <h2 id="plastick.js-if">
-                            <a href="#plastick.js-if" class="permalink">#</a> if()
-                        </h2>
-
-                        <p>AMD Support</p>
-
-
-                        
-
-
-
-
-                        <section class="returns">
-
-                            <h3>Returns</h3>
-
-
-                            <p><code>Void</code></p>
 
 
                         </section>

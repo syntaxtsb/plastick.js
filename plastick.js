@@ -365,7 +365,7 @@
    };
 
     /**
-     * Toggles debug mode. When debug mode is active, a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>. It will also enable automatic <code>console.info()</code> calls to display state changes.
+     * Toggles debug mode. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) it will enable automatic <code>console.info()</code> calls to display state changes.
      *
      * ```
      * game.setDebug(true);
@@ -385,7 +385,7 @@
     };
 
     /**
-     * Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will only be output if debug mode is enabled.
+     * Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will be suppressed unless debug mode is enabled with <code>Plastick.setDebug(true)</code>.
      *
      * ```
      * game.debug('Test message');
@@ -396,7 +396,7 @@
 
     Plastick.prototype.debug = function (info) {
 
-        console.info('Plastick (' + this.currentTick + ' @ ' +
+        if (this._debugMode) console.info('Plastick (' + this.currentTick + ' @ ' +
             (+this.gameTime() / 1000).toFixed(3) + 's): ' + info);
     };
 
@@ -717,9 +717,7 @@
         return this._resume;
     };
 
-    /*
-     * AMD Support
-     */
+    // AMD Support
 
     if (typeof define === 'function' && define.amd !== undefined) {
         define([], function () { return Plastick; });
