@@ -394,7 +394,8 @@
 
     Plastick.prototype.width = function () {
 
-        return this.canvas.width / this.HDPIMode;
+        if (this.canvasMode === 'facade') this.facade.width();
+        else return this.canvas.width / this.HDPIMode;
     };
 
     /**
@@ -404,7 +405,8 @@
 
     Plastick.prototype.height = function () {
 
-        return this.canvas.height / this.HDPIMode;
+        if (this.canvasMode === 'facade') this.facade.height();
+        else return this.canvas.height / this.HDPIMode;
     };
 
     /**
