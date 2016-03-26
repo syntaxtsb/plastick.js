@@ -9,6 +9,11 @@ Plastick's game loop is simulated using a **fixed time step** design, and is dec
 
 Plastick implements a **state stack**, which allows a game developer to easily organize the logic of various game states (splash screen, menu, gameplay, demo screen, pause screen, etc). Each state has it's own update loop, draw loop, and event listeners. When the game needs to change states, Plastick will painlessly handle the logistics of the transition.
 
+Note to v0.3 users
+------------------
+
+Some changes to v0.4 are not compatible with v0.3.x. In order to make the API universal between both native canvas and Facade modes, Plastick.stage has been removed from the library. If retrofitting 0.3 code, please replace all use of Plastick.stage with your choice of Plastick.facade, Plastick.canvas, and/or Plastick.context. When using a Facade object, Plastick's canvas-related references and methods are essentially wrappers for the equivalent Facade versions, so either option is valid.
+
 Installation
 ------------
 

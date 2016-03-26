@@ -1029,7 +1029,18 @@ Note that this does not terminate execution of the current game tick. Since simu
                                             <code>Float</code>
                                     </p>
 
-                                    <p>The virtual width of the canvas.</p>
+                                    <p>The virtual width of the canvas.
+'''
+var stage = document.querySelector('canvas');
+stage.setAttribute('width', 720);
+stage.setAttribute('height', 480);
+var game = new Plastick(stage);</p>
+<p>// displays 480
+console.log(game.height());</p>
+<p>game.setHDPIMode(2);
+// still displays 480
+console.log(game.height());</p>
+<p>'''</p>
 
 
 

@@ -375,6 +375,21 @@
     /**
      * Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.width().
      * @return {Float} The virtual width of the canvas.
+     *
+     * '''
+     * var stage = document.querySelector('canvas');
+     * stage.setAttribute('width', 720);
+     * stage.setAttribute('height', 480);
+     * var game = new Plastick(stage);
+     *
+     * // displays 480
+     * console.log(game.height());
+     *
+     * game.setHDPIMode(2);
+     * // still displays 480
+     * console.log(game.height());
+     *
+     * '''
      */
 
     Plastick.prototype.width = function () {
