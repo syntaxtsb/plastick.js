@@ -41,7 +41,8 @@
      * var game = new Plastick(stage);
      * ```
      *
-     * @property {Object} stage Reference to the canvas object or Facade object linked to this Plastick.
+     * @property {Object} canvas Reference to the canvas object.
+     * @property {Object} facade Reference to the Facade context, if one is being used.
      * @property {Object} context Reference to the canvas rendering context.
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
      * @property {Float} startTime The time the game started running.
@@ -52,20 +53,28 @@
      * @property {Object} methods A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Integer} TARGET_TPS The target rate of game simulation, in ticks per second. Modifying this while the game is running may result in inaccurate simulation.
      * @property {Integer} TICK_CHOKE The maximum number of ticks simulated per canvas frame.
-     * @param {Object} stage The canvas object or Facade object that will handle drawing this Plastick object.
+     * @param {Object} stage The canvas object or Facade object that will handle drawing the Plastick states.
      * @return {Object} New Plastick object.
      * @api public
      */
 
-    function Plastick(stage, hdpi) {
+    function Plastick(stage) {
 
         this.TARGET_TPS = 30; // target game ticks per second
         this.TICK_CHOKE = 50; // max # of ticks per canvas frame
 
-        this.stage = stage;
-        this.context = this.stage.getContext !== undefined ?
-            stage.getContext('2d') : this.stage.context;
-        this.HDPIDisplay = hdpi;
+        if (stage.getContext !== undefined) {
+            this.canvasMode = 'native canvas';
+            this.canvas = stage;
+            this.context = stage.getContext('2d');
+        } else {
+            this.canvasMode = 'facade';
+            this.facade = stage;
+            this.canvas = stage.canvas;
+            this.context = stage.context;
+        }
+
+        this.HDPIMode = 1;
         this.data = {};
         this.methods = {};
         this.states = [];
@@ -89,19 +98,32 @@
         }).bind(this);
 
         document.addEventListener(visibilityChange, this._freeze.bind(this));
+    }
+
+    Plastick.prototype.setHDPIMode = function (scale) {
 
         // set HDPI scale
-        if (this.stage.getContext !== undefined && this.HDPIDisplay) {
-
-            this.HDPIDisplay = (typeof this.HDPIDisplay === 'number') ? this.HDPIDisplay : 2;
-
-            this.stage.setAttribute('style', 'width: ' + this.stage.width + 'px; height: ' + this.stage.height + 'px;');
-            this.stage.setAttribute('width', this.stage.width * this.HDPIDisplay);
-            this.stage.setAttribute('height', this.stage.height * this.HDPIDisplay);
-            this.context.scale(this.HDPIDisplay, this.HDPIDisplay);
-            this.stage.setAttribute('data-resized-for-hdpi', true);
+        if (typeof scale === 'boolean') {
+            this.HDPIMode = scale ? 2 : 1;
+        } else if (typeof scale === 'number') {
+            this.HDPIMode = scale;
+        } else {
+            this.HDPIMode = 1;
         }
-    }
+
+        if (this.canvasMode === 'native canvas') {
+
+            this.canvas.setAttribute('style', 'width: ' + this.canvas.width + 'px; height: ' + this.canvas.height + 'px;');
+            this.canvas.setAttribute('width', this.canvas.width * this.HDPIMode);
+            this.canvas.setAttribute('height', this.canvas.height * this.HDPIMode);
+            this.context.scale(this.HDPIMode, this.HDPIMode);
+            this.canvas.setAttribute('data-resized-for-hdpi', true);
+        } else {
+
+            // set HDPI for Facade object
+            this.facade.resizeForHDPI(this.HDPIMode);
+        }
+    };
 
     /**
      * This will initialize the game with a pre-defined game state and start simulating the game.
@@ -117,9 +139,7 @@
 
     Plastick.prototype.start = function (state) {
 
-        var wasRunning = this.isRunning(),
-            canvasMode = this.stage.getContext !== undefined ?
-            'native canvas' : 'Facade';
+        var wasRunning = this.isRunning();
 
         if (state instanceof Plastick.State && !wasRunning) {
 
@@ -130,15 +150,15 @@
 
             this.states.push(state);
             if (this._debugMode) {
-                this.debug('Game started, using ' + canvasMode + ' (' + this.currentState().name + ')');
+                this.debug('Game started, using ' + this.canvasMode + ' (' + this.currentState().name + ')');
             }
             this._createEventListeners(state);
             state._init(this);
 
-            if (this.stage.getContext !== undefined) {
+            if (this.canvasMode === 'native canvas') {
                 window.requestAnimationFrame(this._requestAnimationFrame.bind(this));
             } else {
-                this.stage.draw(this._gameLoop.bind(this));
+                this.facade.draw(this._gameLoop.bind(this));
             }
 
             return true;
@@ -164,7 +184,7 @@
 
         if (wasRunning) {
             this._isRunning = false;
-            if (this.stage.getContext === undefined) this.stage.stop();
+            if (this.canvasMode === 'facade') this.facade.stop();
             this._cleanup();
 
             if (this._debugMode) {
@@ -352,17 +372,25 @@
         return (after - before) * alpha + before;
     };
 
-   Plastick.prototype.width = function () {
+    /**
+     * Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.width().
+     * @return {Float} The virtual width of the canvas.
+     */
 
-       if (this.HDPIDisplay) return this.stage.width / this.HDPIDisplay;
-       else return this.stage.width;
-   };
+    Plastick.prototype.width = function () {
 
-   Plastick.prototype.height = function () {
+        return this.canvas.width / this.HDPIMode;
+    };
 
-       if (this.HDPIDisplay) return this.stage.height / this.HDPIDisplay;
-       else return this.stage.height;
-   };
+    /**
+     * Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.height().
+     * @return {Float} The virtual height of the canvas.
+     */
+
+    Plastick.prototype.height = function () {
+
+        return this.canvas.height / this.HDPIMode;
+    };
 
     /**
      * Toggles debug mode. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) it will enable automatic <code>console.info()</code> calls to display state changes.
