@@ -288,6 +288,16 @@ pre .hljs {
 
 
                         <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.width" title="Plastick.width">Plastick.width</a>
+                        </li>
+
+
+                        <li class="scope-public">
+                            <a href="#plastick.js-plastick.prototype.height" title="Plastick.height">Plastick.height</a>
+                        </li>
+
+
+                        <li class="scope-public">
                             <a href="#plastick.js-plastick.prototype.setdebug" title="Plastick.setDebug">Plastick.setDebug</a>
                         </li>
 
@@ -406,7 +416,7 @@ pre .hljs {
                                         <code>Object</code>
                                 </p>
 
-                                <p>The canvas object or Facade object that will handle drawing this Plastick object.</p>
+                                <p>The canvas object or Facade object that will handle drawing the Plastick states.</p>
 
 
 
@@ -420,11 +430,20 @@ pre .hljs {
 
 
                                 <p>
-                                    <b>stage</b>
+                                    <b>canvas</b>
                                         <code>Object</code>
                                 </p>
 
-                                <p>Reference to the canvas object or Facade object linked to this Plastick.</p>
+                                <p>Reference to the canvas object.</p>
+
+
+
+                                <p>
+                                    <b>facade</b>
+                                        <code>Object</code>
+                                </p>
+
+                                <p>Reference to the Facade context, if one is being used.</p>
 
 
 
@@ -977,6 +996,74 @@ Note that this does not terminate execution of the current game tick. Since simu
                                     </p>
 
                                     <p>The result of the linear interpolation.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.width">
+                            <a href="#plastick.js-plastick.prototype.width" class="permalink">#</a> Plastick.width()
+                        </h2>
+
+                        <p>Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.width().</p>
+
+
+                        
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Float</code>
+                                    </p>
+
+                                    <p>The virtual width of the canvas.</p>
+
+
+
+
+                        </section>
+
+                    </div>
+
+
+                    <div class="method scope-public">
+
+                        <h2 id="plastick.js-plastick.prototype.height">
+                            <a href="#plastick.js-plastick.prototype.height" class="permalink">#</a> Plastick.height()
+                        </h2>
+
+                        <p>Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.height().</p>
+
+
+                        
+
+
+
+
+                        <section class="returns">
+
+                            <h3>Returns</h3>
+
+
+
+                                    <p>
+                                            <code>Float</code>
+                                    </p>
+
+                                    <p>The virtual height of the canvas.</p>
 
 
 
