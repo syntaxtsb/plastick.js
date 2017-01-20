@@ -32,7 +32,7 @@
         visibilityChange = 'webkitvisibilitychange';
     }
 
-    // Plastick v0.4.0-beta ////////////////////////////////////////////////////
+    // Plastick v0.4.1 /////////////////////////////////////////////////////////
 
     /**
      * Create a Plastick object for your game by passing it a canvas object OR a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.
@@ -45,9 +45,9 @@
      * @property {Object} facade Reference to the Facade context, if one is being used.
      * @property {Object} context Reference to the canvas rendering context.
      * @property {Object} states A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).
-     * @property {Float} startTime The time the game started running.
-     * @property {Integer} currentTick Current unit of game time. Each tick represents one execution of the game state's update() method.
-     * @property {Float} tickAlpha Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.
+     * @property {Float} startTime The session time at which <code>Plastick.start()</code> was called.
+     * @property {Integer} currentTick Current unit of game time. Each tick represents one execution of the <code>Plastick.State.update()</code> method.
+     * @property {Float} tickAlpha Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, usually to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.
      * @property {Boolean} isRunning True if the Plastick object is in a running state.
      * @property {Object} data A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.
      * @property {Object} methods A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.
@@ -167,8 +167,9 @@
     };
 
     /**
-     * This will immediately halt simulation of the game and clear the
-     * entire state stack.
+     * This will end simulation of the game and pop all states off the state stack.
+     *
+     * Note that this does not terminate execution of the current game tick. You may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
      *
      * ```
      * // pressed Escape to quit the game
@@ -211,7 +212,7 @@
     };
 
     /**
-     * This will pause the current game state and start simulation of a new game state on the next game tick by doing the following: <ul><li>Calling the current state's pause() method and destroying its event listeners</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
+     * This will pause the current game state and start simulation of a new game state on the next game tick by doing the following: <ul><li>Calling the current state's <code>pause()</code> method and destroying its event listeners</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's <code>init()</code> method and creating its event listeners</li></ul>
      * Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
      *
      * ```
@@ -247,7 +248,7 @@
 
     /**
      * This will end the current game state and resume simulation of the previous game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack, making the prior state the current state</li><li>Calling the prior state's <code>resume()</code> method and creating its event listeners</li></ul>
-     * Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
+     * Note that this does not terminate execution of the current game tick. Since simulation of the prior state will not resume until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
      *
      * If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.
      *
@@ -289,8 +290,8 @@
     };
 
     /**
-     * This will redirect simulation from the current game state to a new game state on the next game tick by doing the following:<ul><li>Calling the current state's cleanup() method and destroying its event listeners</li><li>Popping the current state off the state stack and pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
-     * Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
+     * This will redirect simulation from the current game state to a new game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's <code>init()</code> method and creating its event listeners</li></ul>
+     * Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.
      *
      * If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.
      *
@@ -360,7 +361,8 @@
      *
      * @param {Float} before The "before" value.
      * @param {Float} after The "after" value.
-     * @param {Float} [alpha] If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0.
+     * @param {Float} [alpha] If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0 (although other
+     values will be processed respectively if you need to do so).
      * @return {Float} The result of the linear interpolation.
      */
 
@@ -373,10 +375,9 @@
     };
 
     /**
-     * Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.width().
-     * @return {Float} The virtual width of the canvas.
+     * Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to <code>Facade.width()</code>.
      *
-     * '''
+     * ```
      * var stage = document.querySelector('canvas');
      * stage.setAttribute('width', 720);
      * stage.setAttribute('height', 480);
@@ -389,7 +390,9 @@
      * // still displays 480
      * console.log(game.height());
      *
-     * '''
+     * ```
+     *
+     * @return {Float} The virtual width of the canvas.
      */
 
     Plastick.prototype.width = function () {
@@ -399,7 +402,7 @@
     };
 
     /**
-     * Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.height().
+     * Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to <code>Facade.height()</code>.
      * @return {Float} The virtual height of the canvas.
      */
 
@@ -410,7 +413,7 @@
     };
 
     /**
-     * Toggles debug mode. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) it will enable automatic <code>console.info()</code> calls to display state changes.
+     * Toggles "debug mode". When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) state changes will be displayed with automatic <code>console.info()</code> calls.
      *
      * ```
      * game.setDebug(true);
@@ -516,23 +519,26 @@
     };
 
     /**
-     * The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame()). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:
+     * The main game loop. The game is simulated using a fixed time step design. <code>Plastick.State._update()</code> is called once per game tick, but several ticks could be simulated before the canvas is rendered with <code>Plastick.State._draw()</code>. Thus, the rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by <code>requestAnimationFrame()</code>). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of <code>Plastick.TICK_CHOKE</code> ticks per call. Below is Plastick's implementation of this game loop:
      *
      * ```
      * function () {
-     *
-     *     var ticksUpdated = 0;
+
+     *     var ticksUpdated = 0,
+     *         sameState = this.currentState();
      *
      *     this._frameTime = this.gameTime();
      *     while (this._frameTime * this.TARGET_TPS / 1000 > this.currentTick &&
-     *             ticksUpdated < this.TICK_CHOKE) {
+     *             ticksUpdated < this.TICK_CHOKE &&
+     *             this._isRunning) {
+     *
      *         this.currentTick += 1;
      *         ticksUpdated += 1;
      *         this.currentState()._update(this);
      *         this.tickTime = this.gameTime();
      *     }
      *     // skip draw if game was stopped (no state on the stack!)
-     *     if (this._isRunning) {
+     *     if (this._isRunning && this.currentState() === sameState) {
      *         this.tickAlpha = this.gameTime() * this.TARGET_TPS / 1000 - this.currentTick + 1;
      *         this.currentState()._draw(this);
      *     }
@@ -603,7 +609,7 @@
     };
 
     /**
-     * This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.
+     * This method allows the user to register an event listener with this state. All registered events are added to the page when this state is started or resumed, and they are removed from the page when this state is paused or finished.
      *
      * ```
      * menuState.registerListener(document, 'click', function() {...});
@@ -705,7 +711,7 @@
     };
 
     /**
-     * Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick (or Facade if it was passed to Plastick upon construction).
+     * Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call <code>requestAnimationFrame()</code>; this is done automatically by Plastick (or by Facade if it was passed to Plastick upon construction).
      *
      * ```
      * menuState.draw(function() {

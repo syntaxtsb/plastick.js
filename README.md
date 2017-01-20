@@ -1,4 +1,4 @@
-[![online documentation](http://doxdox.herokuapp.com/images/badge.svg)](http://doxdox.herokuapp.com/syntaxtsb/plastick.js)
+[![online documentation](https://doxdox.org/images/badge-flat.svg)](https://doxdox.org/syntaxtsb/plastick.js)
 
 Plastick.js
 ===========
@@ -12,7 +12,7 @@ Plastick implements a **state stack**, which allows a game developer to easily o
 Note to v0.3 users
 ------------------
 
-Some changes to v0.4 are not compatible with v0.3.x. In order to make the API universal between both native canvas and Facade modes, Plastick.stage has been removed from the library. If retrofitting 0.3 code, please replace all use of Plastick.stage with your choice of Plastick.facade, Plastick.canvas, and/or Plastick.context. When using a Facade object, Plastick's canvas-related references and methods are essentially wrappers for the equivalent Facade versions, so either option is valid.
+Some changes to v0.4 are not compatible with older versions. In order to make the API universal between both native canvas and Facade modes, Plastick.stage has been removed from the library. If retrofitting 0.3 code, please replace all use of `Plastick.stage` with your choice of `Plastick.facade`, `Plastick.canvas`, and/or `Plastick.context`. When using a Facade object, Plastick's canvas-related references and methods are essentially wrappers for the equivalent Facade references, so either option is valid.
 
 Installation
 ------------
@@ -29,7 +29,7 @@ var stage = new Facade(document.querySelector('canvas')),
     game = new Plastick(stage),
     state = new Plastick.State();
 
-// register an event handler for stopping the game with the space bar
+// register an event handler for stopping the demo with the space bar
 state.registerListener(document, 'keydown', function (e) {
     if (e.keyCode === 32) game.stop();
 });

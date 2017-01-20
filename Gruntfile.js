@@ -35,8 +35,11 @@ module.exports = function (grunt) {
         },
         doxdox: {
             dev: {
-                input: 'plastick.js',
-                output: 'docs/index.html'
+                inputs: ['plastick.js'],
+                output: 'docs/index.html',
+                config: {
+                    layout: 'bootstrap'
+                }
             }
         },
         jasmine: {

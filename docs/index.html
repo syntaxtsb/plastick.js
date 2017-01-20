@@ -3,208 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1">
-<title>plastick.js &#8212; A lightweight, time-accurate game loop framework for Javascript.</title>
+<title>plastick.js 0.4.1 &#8212; A lightweight, time-accurate game loop framework for Javascript.</title>
+<meta name="description" content="A lightweight, time-accurate game loop framework for Javascript.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/github.min.css">
 <style>
 
-.back-to-top {
-    display: none;
-    position: fixed;
-    right: 1em;
-    bottom: 1em;
-    z-index: 999;
+.jumbotron {
+    margin-bottom: 0;
+    border-radius: 0;
+    background-color: #2B303E;
+    -webkit-font-smoothing: antialiased;
 }
 
-.back-to-top a {
+.jumbotron h1 {
+    font-size: 3.5rem;
+    line-height: 1;
+}
+
+.jumbotron h1,
+.jumbotron h1 a {
+    color: #eee;
+}
+
+.jumbotron small {
+    font-weight: 200;
+    color: #777;
+}
+
+.jumbotron p {
+    font-size: 1.5rem;
+    font-weight: 200;
+    line-height: 1.2;
+    color: #ccc;
+}
+
+.wrap {
+    padding: 2rem 1rem;
+}
+
+.search {
+    margin: 0 0 1rem 0;
+    width: 90%;
+}
+
+.menu {
+    padding: 0;
+}
+
+.menu li {
+    list-style: none;
+}
+
+.menu li ul {
+    padding: 0;
+}
+
+.menu li a {
     display: block;
-    padding: .5em .6em;
-    line-height: 1em;
-    border-radius: .25em;
-    background: #fff;
+    padding: .25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.back-to-top a svg {
-    vertical-align: middle;
+.menu .file {
+    color: #E54D89;
+}
+
+.menu .file + ul {
+    margin: 0 0 1rem 0;
+}
+
+.menu .scope-private a {
+    color: #8BAAC6;
+}
+
+.method {
+    margin: 0 0 4rem 0;
+}
+
+.method .method-name {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.method .method-name + .scope-private {
+    color: #AAAAAA;
+}
+
+.method section {
+    margin: 2rem 0;
+}
+
+.method h3 {
+    margin: 0 0 1rem 0;
+}
+
+.method .table,
+.method .table p,
+.method .table ol,
+.method .table ul {
+    margin: 0;
 }
 
 .permalink {
     position: absolute;
-    margin-left: -.75em;
+    margin-left: -1em;
     font-weight: normal;
     color: #eee;
-}
-
-.permalink:hover {
     text-decoration: none;
 }
 
-.method h2 {
-    line-height: 1.3em;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.permalink:hover,
-.doxdox .menu .file {
+.permalink:hover {
     color: #E54D89;
 }
 
-pre .hljs {
-    padding: 0;
-    background: none;
+.back-to-top {
+    display: none;
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    padding: .5rem .6rem;
+    line-height: 1;
+    background: #fff;
+    z-index: 999;
 }
 
-.doxdox .wrap {
-    padding: 0 1em;
-}
-
-.doxdox .jumbotron p,
-.doxdox .label-default {
-    -webkit-font-smoothing: antialiased;
-}
-
-.doxdox .jumbotron {
-    margin-bottom: 0;
-    background-color: #2B303E;
-}
-
-.doxdox .jumbotron h1,
-.doxdox .jumbotron h1 a {
-    color: #eee;
-}
-
-.doxdox .jumbotron p {
-    color: #ccc;
-}
-
-.doxdox .menu {
-    margin: 1.5em 0 0 0;
-    padding: 0;
-}
-
-.doxdox .menu li {
-    list-style: none;
-}
-
-.doxdox .menu li ul {
-    padding: 0;
-}
-
-.doxdox .menu li a {
+.back-to-top.visible {
     display: block;
-    padding: .25em;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.doxdox .menu .scope-private a {
-    color: #8BAAC6;
+.back-to-top svg {
+    vertical-align: middle;
 }
 
-.doxdox .bs-footer {
-    margin: 3em auto;
+.bs-footer {
+    margin: 3rem auto;
     color: #777;
     text-align: center;
 }
 
 </style>
-<script>
-
-(function (w, d, f) {
-
-    'use strict';
-
-    var protocol = w.location.protocol === 'file:' ? 'http:' : w.location.protocol,
-        resource = [
-            '//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
-            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/github.min.css',
-            '//code.jquery.com/jquery-2.1.4.js',
-            '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js'
-        ];
-
-    function loadResource(url) {
-
-        var tag;
-
-        if (url.match(/\.js$/)) {
-
-            tag = d.createElement('script');
-            tag.setAttribute('src', protocol + url);
-
-        } else if (url.match(/\.css$/)) {
-
-            tag = d.createElement('link');
-            tag.setAttribute('rel', 'stylesheet');
-            tag.setAttribute('href', protocol + url);
-
-        }
-
-        tag.addEventListener('load', function () {
-
-            if (resource.length) {
-
-                loadResource(resource.shift());
-
-            } else {
-
-                if ($.isReady) {
-
-                    f();
-
-                } else {
-
-                    $(document).ready(f);
-
-                }
-
-            }
-
-        });
-
-        d.head.appendChild(tag);
-
-    }
-
-    loadResource(resource.shift());
-
-}(window, document, function () {
-
-    'use strict';
-
-    var headerHeight = $('.jumbotron').outerHeight(true),
-        $backToTop = $('.back-to-top');
-
-    function handleScrollEvent() {
-
-        if (window.scrollY > headerHeight && $backToTop.not(':visible')) {
-
-            $backToTop.fadeIn();
-
-        } else if (window.scrollY < headerHeight && $backToTop.is(':visible')) {
-
-            $backToTop.fadeOut();
-
-        }
-
-    }
-
-    $('pre code:not(.hljs)').each(function () {
-        hljs.highlightBlock(this);
-    });
-
-    $(window).on('scroll', handleScrollEvent);
-
-    handleScrollEvent();
-
-}));
-
-</script>
 </head>
 
-<body class="doxdox">
+<body>
 
-<div class="back-to-top">
-    <a href="#"> <svg xmlns="http://www.w3.org/2000/svg" width="13px" height="14px" viewBox="0 0 13 14"><path d="M7.18761156,13 L7.18761156,5.49249703 L10.4587853,5.49249703 L5.09931763,0.113558129 L-0.26015,5.49249703 L3.01102371,5.49249703 L3.01102371,13 L7.18761156,13 Z" fill="#428bca"></path></svg> Back to Top</a>
-</div>
+<a href="#" class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" width="13px" height="14px" viewBox="0 0 13 14"><path d="M7.18761156,13 L7.18761156,5.49249703 L10.4587853,5.49249703 L5.09931763,0.113558129 L-0.26015,5.49249703 L3.01102371,5.49249703 L3.01102371,13 L7.18761156,13 Z" fill="#428bca"></path></svg> Back to Top</a>
 
 <div class="jumbotron">
 
@@ -212,7 +159,7 @@ pre .hljs {
 
         <h1>
                 plastick.js
-            <small>0.4.1-beta</small>
+            <small>0.4.1</small>
         </h1>
 
         <p>A lightweight, time-accurate game loop framework for Javascript.</p>
@@ -229,6 +176,8 @@ pre .hljs {
 
             <div class="col-md-3 hidden-sm hidden-xs">
 
+                <input type="text" class="form-control search" id="search-methods" placeholder="Search..." autocomplete="off">
+
                 <ul class="menu">
 
 
@@ -237,142 +186,142 @@ pre .hljs {
                         <ul>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick" title="Plastick">Plastick</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.start" title="Plastick.start">Plastick.start</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.stop" title="Plastick.stop">Plastick.stop</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.isrunning" title="Plastick.isRunning">Plastick.isRunning</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.pushstate" title="Plastick.pushState">Plastick.pushState</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.popstate" title="Plastick.popState">Plastick.popState</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.changestate" title="Plastick.changeState">Plastick.changeState</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.currentstate" title="Plastick.currentState">Plastick.currentState</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.gametime" title="Plastick.gameTime">Plastick.gameTime</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.lerp" title="Plastick.lerp">Plastick.lerp</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.width" title="Plastick.width">Plastick.width</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.height" title="Plastick.height">Plastick.height</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.setdebug" title="Plastick.setDebug">Plastick.setDebug</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.prototype.debug" title="Plastick.debug">Plastick.debug</a>
                         </li>
 
 
-                        <li class="scope-private">
+                        <li class="method-link scope-private">
                             <a href="#plastick.js-plastick.prototype._cleanup" title="Plastick._cleanup">Plastick._cleanup</a>
                         </li>
 
 
-                        <li class="scope-private">
+                        <li class="method-link scope-private">
                             <a href="#plastick.js-plastick.prototype._freeze" title="Plastick._freeze">Plastick._freeze</a>
                         </li>
 
 
-                        <li class="scope-private">
+                        <li class="method-link scope-private">
                             <a href="#plastick.js-plastick.prototype._createeventlisteners" title="Plastick._createEventListeners">Plastick._createEventListeners</a>
                         </li>
 
 
-                        <li class="scope-private">
+                        <li class="method-link scope-private">
                             <a href="#plastick.js-plastick.prototype._destroyeventlisteners" title="Plastick._destroyEventListeners">Plastick._destroyEventListeners</a>
                         </li>
 
 
-                        <li class="scope-private">
+                        <li class="method-link scope-private">
                             <a href="#plastick.js-plastick.prototype._gameloop" title="Plastick._gameLoop">Plastick._gameLoop</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state" title="Plastick.State">Plastick.State</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.registerlistener" title="Plastick.State.registerListener">Plastick.State.registerListener</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.deregisterlistener" title="Plastick.State.deregisterListener">Plastick.State.deregisterListener</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.init" title="Plastick.State.init">Plastick.State.init</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.cleanup" title="Plastick.State.cleanup">Plastick.State.cleanup</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.update" title="Plastick.State.update">Plastick.State.update</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.draw" title="Plastick.State.draw">Plastick.State.draw</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.pause" title="Plastick.State.pause">Plastick.State.pause</a>
                         </li>
 
 
-                        <li class="scope-public">
+                        <li class="method-link scope-public">
                             <a href="#plastick.js-plastick.state.prototype.resume" title="Plastick.State.resume">Plastick.State.resume</a>
                         </li>
 
@@ -389,36 +338,57 @@ pre .hljs {
             <div class="col-md-9">
 
 
-                <a id="plastick.js" />
+                <a id="plastick.js"></a>
 
 
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick">
-                            <a href="#plastick.js-plastick" class="permalink">#</a> Plastick(stage)
+                            <a href="#plastick.js-plastick" class="permalink">#</a>
+                            <span class="method-name" title="Plastick(stage)">Plastick(stage)</span>
                         </h2>
 
-                        <p>Create a Plastick object for your game by passing it a canvas object OR a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
+                        <div class="description lead">
 
-
-                        <pre><code><span class="hljs-keyword">var</span> game = <span class="hljs-keyword">new</span> Plastick(stage);
+                            <p>Create a Plastick object for your game by passing it a canvas object OR a Facade object that will be used to draw to the canvas. The Plastick object automatically controls the update loop and draw loop for your game project, and transfers the game simulation between various States.</p>
+<pre><code><span class="hljs-keyword">var</span> game = <span class="hljs-keyword">new</span> Plastick(stage);
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>stage</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The canvas object or Facade object that will handle drawing the Plastick states.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>stage</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The canvas object or Facade object that will handle drawing the Plastick states.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -428,114 +398,143 @@ pre .hljs {
 
                             <h3>Properties</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>canvas</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>Reference to the canvas object.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>canvas</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>Reference to the canvas object.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>facade</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>Reference to the Facade context, if one is being used.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>context</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>Reference to the canvas rendering context.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>states</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>startTime</td>
+                                        <td>
+                                            <code>Float</code>
+                                        </td>
+                                        <td><p>The session time at which <code>Plastick.start()</code> was called.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>currentTick</td>
+                                        <td>
+                                            <code>Integer</code>
+                                        </td>
+                                        <td><p>Current unit of game time. Each tick represents one execution of the <code>Plastick.State.update()</code> method.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>tickAlpha</td>
+                                        <td>
+                                            <code>Float</code>
+                                        </td>
+                                        <td><p>Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, usually to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>isRunning</td>
+                                        <td>
+                                            <code>Boolean</code>
+                                        </td>
+                                        <td><p>True if the Plastick object is in a running state.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>data</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>methods</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>TARGET_TPS</td>
+                                        <td>
+                                            <code>Integer</code>
+                                        </td>
+                                        <td><p>The target rate of game simulation, in ticks per second. Modifying this while the game is running may result in inaccurate simulation.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>TICK_CHOKE</td>
+                                        <td>
+                                            <code>Integer</code>
+                                        </td>
+                                        <td><p>The maximum number of ticks simulated per canvas frame.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
-
-                                <p>
-                                    <b>facade</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>Reference to the Facade context, if one is being used.</p>
-
-
-
-                                <p>
-                                    <b>context</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>Reference to the canvas rendering context.</p>
-
-
-
-                                <p>
-                                    <b>states</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>A stack of game states for flipping through various states of the game (intro, demo screen, menus, pause screen, etc).</p>
-
-
-
-                                <p>
-                                    <b>startTime</b>
-                                        <code>Float</code>
-                                </p>
-
-                                <p>The time the game started running.</p>
-
-
-
-                                <p>
-                                    <b>currentTick</b>
-                                        <code>Integer</code>
-                                </p>
-
-                                <p>Current unit of game time. Each tick represents one execution of the game state's update() method.</p>
-
-
-
-                                <p>
-                                    <b>tickAlpha</b>
-                                        <code>Float</code>
-                                </p>
-
-                                <p>Interpolation (alpha) value of current tick. This is used in a system implementing fixed time step interpolation, to smooth screen updates that occur in between ticks. Updated immediately before executing the <code>Plastick.State.draw()</code> code.</p>
-
-
-
-                                <p>
-                                    <b>isRunning</b>
-                                        <code>Boolean</code>
-                                </p>
-
-                                <p>True if the Plastick object is in a running state.</p>
-
-
-
-                                <p>
-                                    <b>data</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>A generic object which the user can store any game-related data in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
-
-
-
-                                <p>
-                                    <b>methods</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>A generic object which the user can store any game-related methods in. This is not explicitly used by the Plastick framework, so you can store anything here.</p>
-
-
-
-                                <p>
-                                    <b>TARGET_TPS</b>
-                                        <code>Integer</code>
-                                </p>
-
-                                <p>The target rate of game simulation, in ticks per second. Modifying this while the game is running may result in inaccurate simulation.</p>
-
-
-
-                                <p>
-                                    <b>TICK_CHOKE</b>
-                                        <code>Integer</code>
-                                </p>
-
-                                <p>The maximum number of ticks simulated per canvas frame.</p>
-
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -564,30 +563,51 @@ pre .hljs {
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.start">
-                            <a href="#plastick.js-plastick.prototype.start" class="permalink">#</a> Plastick.start(state)
+                            <a href="#plastick.js-plastick.prototype.start" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.start(state)">Plastick.start(state)</span>
                         </h2>
 
-                        <p>This will initialize the game with a pre-defined game state and start simulating the game.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>game.start(introState);
+                            <p>This will initialize the game with a pre-defined game state and start simulating the game.</p>
+<pre><code>game.start(introState);
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>state</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The Plastick.State object to start simulating with.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The Plastick.State object to start simulating with.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -617,17 +637,20 @@ pre .hljs {
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.stop">
-                            <a href="#plastick.js-plastick.prototype.stop" class="permalink">#</a> Plastick.stop()
+                            <a href="#plastick.js-plastick.prototype.stop" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.stop()">Plastick.stop()</span>
                         </h2>
 
-                        <p>This will immediately halt simulation of the game and clear the
-entire state stack.</p>
+                        <div class="description lead">
 
-
-                        <pre><code><span class="hljs-comment">// pressed Escape to quit the game</span>
+                            <p>This will end simulation of the game and pop all states off the state stack.</p>
+<p>Note that this does not terminate execution of the current game tick. You may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
+<pre><code><span class="hljs-comment">// pressed Escape to quit the game</span>
 <span class="hljs-keyword">if</span> (pressedEsc) { game.stop(); }
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -655,15 +678,18 @@ entire state stack.</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.isrunning">
-                            <a href="#plastick.js-plastick.prototype.isrunning" class="permalink">#</a> Plastick.isRunning()
+                            <a href="#plastick.js-plastick.prototype.isrunning" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.isRunning()">Plastick.isRunning()</span>
                         </h2>
 
-                        <p>Used to check if the game is running.</p>
+                        <div class="description lead">
 
-
-                        <pre><code><span class="hljs-keyword">if</span> (game.isRunning()) { <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The game is running!'</span>); }
+                            <p>Used to check if the game is running.</p>
+<pre><code><span class="hljs-keyword">if</span> (game.isRunning()) { <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'The game is running!'</span>); }
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -691,14 +717,15 @@ entire state stack.</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.pushstate">
-                            <a href="#plastick.js-plastick.prototype.pushstate" class="permalink">#</a> Plastick.pushState(state)
+                            <a href="#plastick.js-plastick.prototype.pushstate" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.pushState(state)">Plastick.pushState(state)</span>
                         </h2>
 
-                        <p>This will pause the current game state and start simulation of a new game state on the next game tick by doing the following: <ul><li>Calling the current state's pause() method and destroying its event listeners</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
+                        <div class="description lead">
+
+                            <p>This will pause the current game state and start simulation of a new game state on the next game tick by doing the following: <ul><li>Calling the current state's <code>pause()</code> method and destroying its event listeners</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's <code>init()</code> method and creating its event listeners</li></ul>
 Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
-
-
-                        <pre><code><span class="hljs-comment">// pause the game</span>
+<pre><code><span class="hljs-comment">// pause the game</span>
 <span class="hljs-keyword">if</span> (pauseButtonPressed) {
     game.pushState(pauseState);
     <span class="hljs-keyword">return</span>;
@@ -706,20 +733,40 @@ Note that this does not terminate execution of the current game tick. Since simu
 </code></pre>
 
 
+                        </div>
+
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>state</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The <code>Plastick.State</code> object to switch simulation to.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The <code>Plastick.State</code> object to switch simulation to.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -749,14 +796,15 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.popstate">
-                            <a href="#plastick.js-plastick.prototype.popstate" class="permalink">#</a> Plastick.popState()
+                            <a href="#plastick.js-plastick.prototype.popstate" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.popState()">Plastick.popState()</span>
                         </h2>
 
-                        <p>This will end the current game state and resume simulation of the previous game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack, making the prior state the current state</li><li>Calling the prior state's <code>resume()</code> method and creating its event listeners</li></ul>
-Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
+                        <div class="description lead">
 
-
-                        <p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
+                            <p>This will end the current game state and resume simulation of the previous game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack, making the prior state the current state</li><li>Calling the prior state's <code>resume()</code> method and creating its event listeners</li></ul>
+Note that this does not terminate execution of the current game tick. Since simulation of the prior state will not resume until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
+<p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked.</p>
 <pre><code><span class="hljs-comment">// unpause the game</span>
 <span class="hljs-keyword">if</span> (pauseButtonPressed) {
     game.popState();
@@ -764,6 +812,8 @@ Note that this does not terminate execution of the current game tick. Since simu
 }
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -791,14 +841,15 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.changestate">
-                            <a href="#plastick.js-plastick.prototype.changestate" class="permalink">#</a> Plastick.changeState(state)
+                            <a href="#plastick.js-plastick.prototype.changestate" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.changeState(state)">Plastick.changeState(state)</span>
                         </h2>
 
-                        <p>This will redirect simulation from the current game state to a new game state on the next game tick by doing the following:<ul><li>Calling the current state's cleanup() method and destroying its event listeners</li><li>Popping the current state off the state stack and pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's init() method and creating its event listeners</li></ul>
-Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this with a <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
+                        <div class="description lead">
 
-
-                        <p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
+                            <p>This will redirect simulation from the current game state to a new game state on the next game tick by doing the following:<ul><li>Calling the current state's <code>cleanup()</code> method and destroying its event listeners</li><li>Popping the current state off the state stack</li><li>Pushing the passed State onto the state stack, making it the current state</li><li>Calling the new state's <code>init()</code> method and creating its event listeners</li></ul>
+Note that this does not terminate execution of the current game tick. Since simulation of the new state will not begin until the next game tick, you may want to follow this by <code>return</code>ing from the update loop, or alternately place this call at the very end of your update loop.</p>
+<p>If calling this method empties the state stack, <code>Plastick.stop()</code> will be invoked. This may happen if the passed state is invalid and cannot be pushed onto the state stack.</p>
 <pre><code><span class="hljs-comment">// enter the main menu from the intro splash screen</span>
 <span class="hljs-keyword">if</span> (pressedAnyKey) {
     game.changeState(menuState);
@@ -807,20 +858,40 @@ Note that this does not terminate execution of the current game tick. Since simu
 </code></pre>
 
 
+                        </div>
+
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>state</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The <code>Plastick.State</code> object to switch simulation to.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The <code>Plastick.State</code> object to switch simulation to.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -850,13 +921,16 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.currentstate">
-                            <a href="#plastick.js-plastick.prototype.currentstate" class="permalink">#</a> Plastick.currentState()
+                            <a href="#plastick.js-plastick.prototype.currentstate" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.currentState()">Plastick.currentState()</span>
                         </h2>
 
-                        <p>This returns the State currently being simulated.</p>
+                        <div class="description lead">
+
+                            <p>This returns the State currently being simulated.</p>
 
 
-                        
+                        </div>
 
 
 
@@ -884,29 +958,50 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.gametime">
-                            <a href="#plastick.js-plastick.prototype.gametime" class="permalink">#</a> Plastick.gameTime([time])
+                            <a href="#plastick.js-plastick.prototype.gametime" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.gameTime([time])">Plastick.gameTime([time])</span>
                         </h2>
 
-                        <p>This returns the number of milliseconds that have passed in the game. If a time argument is passed in (milliseconds since the page session started), this instead converts that time to the equivalent game time and returns the result. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
+                        <div class="description lead">
+
+                            <p>This returns the number of milliseconds that have passed in the game. If a time argument is passed in (milliseconds since the page session started), this instead converts that time to the equivalent game time and returns the result. Note that game time may be suspended whenever the containing browser tab is hidden.</p>
 
 
-                        
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>time</b>
-                                        <code>Integer</code>
-                                        <span class="label label-default">Optional</span>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>A timestamp (time since beginning of session) to convert to game time.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>time</td>
+                                        <td>
+                                            <code>Integer</code>
+                                        </td>
+                                        <td><p>A timestamp (time since beginning of session) to convert to game time.</p>
+</td>
+                                        <td>
+                                                <span class="tag tag-default">Optional</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -936,49 +1031,72 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.lerp">
-                            <a href="#plastick.js-plastick.prototype.lerp" class="permalink">#</a> Plastick.lerp(before, after[, alpha])
+                            <a href="#plastick.js-plastick.prototype.lerp" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.lerp(before, after[, alpha])">Plastick.lerp(before, after[, alpha])</span>
                         </h2>
 
-                        <p>Performs a linear interpolation between two numeric values using <code>Plastick.tickAlpha</code>.</p>
+                        <div class="description lead">
 
-
-                        <pre><code><span class="hljs-keyword">var</span> xPos = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
+                            <p>Performs a linear interpolation between two numeric values using <code>Plastick.tickAlpha</code>.</p>
+<pre><code><span class="hljs-keyword">var</span> xPos = game.lerp(sprite.prevPosition.x, sprite.currPosition.x);
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>before</b>
-                                        <code>Float</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The &quot;before&quot; value.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>before</td>
+                                        <td>
+                                            <code>Float</code>
+                                        </td>
+                                        <td><p>The &quot;before&quot; value.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>after</td>
+                                        <td>
+                                            <code>Float</code>
+                                        </td>
+                                        <td><p>The &quot;after&quot; value.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>alpha</td>
+                                        <td>
+                                            <code>Float</code>
+                                        </td>
+                                        <td><p>If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0 (although other      values will be processed respectively if you need to do so).</p>
+</td>
+                                        <td>
+                                                <span class="tag tag-default">Optional</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
-
-                                <p>
-                                    <b>after</b>
-                                        <code>Float</code>
-                                </p>
-
-                                <p>The &quot;after&quot; value.</p>
-
-
-
-                                <p>
-                                    <b>alpha</b>
-                                        <code>Float</code>
-                                        <span class="label label-default">Optional</span>
-                                </p>
-
-                                <p>If provided, the values will be interpolated using this, instead of <code>Plastick.tickAlpha</code>. This should be a value between 0.0 and 1.0.</p>
-
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1008,13 +1126,29 @@ Note that this does not terminate execution of the current game tick. Since simu
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.width">
-                            <a href="#plastick.js-plastick.prototype.width" class="permalink">#</a> Plastick.width()
+                            <a href="#plastick.js-plastick.prototype.width" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.width()">Plastick.width()</span>
                         </h2>
 
-                        <p>Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.width().</p>
+                        <div class="description lead">
+
+                            <p>Returns the width of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to <code>Facade.width()</code>.</p>
+<pre><code><span class="hljs-keyword">var</span> stage = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'canvas'</span>);
+stage.setAttribute(<span class="hljs-string">'width'</span>, <span class="hljs-number">720</span>);
+stage.setAttribute(<span class="hljs-string">'height'</span>, <span class="hljs-number">480</span>);
+<span class="hljs-keyword">var</span> game = <span class="hljs-keyword">new</span> Plastick(stage);
+
+<span class="hljs-comment">// displays 480</span>
+<span class="hljs-built_in">console</span>.log(game.height());
+
+game.setHDPIMode(<span class="hljs-number">2</span>);
+<span class="hljs-comment">// still displays 480</span>
+<span class="hljs-built_in">console</span>.log(game.height());
+
+</code></pre>
 
 
-                        
+                        </div>
 
 
 
@@ -1029,18 +1163,7 @@ Note that this does not terminate execution of the current game tick. Since simu
                                             <code>Float</code>
                                     </p>
 
-                                    <p>The virtual width of the canvas.
-'''
-var stage = document.querySelector('canvas');
-stage.setAttribute('width', 720);
-stage.setAttribute('height', 480);
-var game = new Plastick(stage);</p>
-<p>// displays 480
-console.log(game.height());</p>
-<p>game.setHDPIMode(2);
-// still displays 480
-console.log(game.height());</p>
-<p>'''</p>
+                                    <p>The virtual width of the canvas.</p>
 
 
 
@@ -1053,13 +1176,16 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.height">
-                            <a href="#plastick.js-plastick.prototype.height" class="permalink">#</a> Plastick.height()
+                            <a href="#plastick.js-plastick.prototype.height" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.height()">Plastick.height()</span>
                         </h2>
 
-                        <p>Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to Facade.height().</p>
+                        <div class="description lead">
+
+                            <p>Returns the height of the canvas, independent of the HDPI mode. When using a Facade object, this should be equivalent to <code>Facade.height()</code>.</p>
 
 
-                        
+                        </div>
 
 
 
@@ -1087,15 +1213,18 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.setdebug">
-                            <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a> Plastick.setDebug()
+                            <a href="#plastick.js-plastick.prototype.setdebug" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.setDebug()">Plastick.setDebug()</span>
                         </h2>
 
-                        <p>Toggles debug mode. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) it will enable automatic <code>console.info()</code> calls to display state changes.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>game.setDebug(<span class="hljs-literal">true</span>);
+                            <p>Toggles &quot;debug mode&quot;. When debug mode is active, 1) calls to <code>Plastick.debug()</code> will output text to the console, 2) a global event is registered to the 'SHIFT + SPACE' key combo to call <code>Plastick.stop()</code>, and 3) state changes will be displayed with automatic <code><a href="http://console.info">console.info</a>()</code> calls.</p>
+<pre><code>game.setDebug(<span class="hljs-literal">true</span>);
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -1116,30 +1245,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.prototype.debug">
-                            <a href="#plastick.js-plastick.prototype.debug" class="permalink">#</a> Plastick.debug(info)
+                            <a href="#plastick.js-plastick.prototype.debug" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.debug(info)">Plastick.debug(info)</span>
                         </h2>
 
-                        <p>Outputs a custom debug message with a Plastick timestamp, using <code>console.info()</code>. The message will be suppressed unless debug mode is enabled with <code>Plastick.setDebug(true)</code>.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>game.debug(<span class="hljs-string">'Test message'</span>);
+                            <p>Outputs a custom debug message with a Plastick timestamp, using <code><a href="http://console.info">console.info</a>()</code>. The message will be suppressed unless debug mode is enabled with <code>Plastick.setDebug(true)</code>.</p>
+<pre><code>game.debug(<span class="hljs-string">'Test message'</span>);
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>info</b>
-                                        <code>String</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>Text to be output to the console.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>info</td>
+                                        <td>
+                                            <code>String</code>
+                                        </td>
+                                        <td><p>Text to be output to the console.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1162,14 +1312,17 @@ console.log(game.height());</p>
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._cleanup">
-                            <a href="#plastick.js-plastick.prototype._cleanup" class="permalink">#</a> Plastick._cleanup()
-                            <small>private method</small>
+                            <a href="#plastick.js-plastick.prototype._cleanup" class="permalink">#</a>
+                            <span class="method-name" title="Plastick._cleanup()">Plastick._cleanup()</span>
+                            <small class="scope-private">private method</small>
                         </h2>
 
-                        <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
+                        <div class="description lead">
+
+                            <p>Performs cleanup maintenance on a game that has been halted with <code>Plastick.stop()</code>.</p>
 
 
-                        
+                        </div>
 
 
 
@@ -1196,16 +1349,19 @@ console.log(game.height());</p>
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._freeze">
-                            <a href="#plastick.js-plastick.prototype._freeze" class="permalink">#</a> Plastick._freeze()
-                            <small>private method</small>
+                            <a href="#plastick.js-plastick.prototype._freeze" class="permalink">#</a>
+                            <span class="method-name" title="Plastick._freeze()">Plastick._freeze()</span>
+                            <small class="scope-private">private method</small>
                         </h2>
 
-                        <p>Freezes or unfreezes the game simulation (depending on the &quot;blur&quot; state of the web page when it's called). The example code shows how Plastick uses this method.</p>
+                        <div class="description lead">
 
-
-                        <pre><code><span class="hljs-built_in">document</span>.addEventListener(visibilityChange, <span class="hljs-keyword">this</span>._freeze.bind(<span class="hljs-keyword">this</span>));
+                            <p>Freezes or unfreezes the game simulation (depending on the &quot;blur&quot; state of the web page when it's called). The example code shows how Plastick uses this method.</p>
+<pre><code><span class="hljs-built_in">document</span>.addEventListener(visibilityChange, <span class="hljs-keyword">this</span>._freeze.bind(<span class="hljs-keyword">this</span>));
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -1231,29 +1387,50 @@ console.log(game.height());</p>
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._createeventlisteners">
-                            <a href="#plastick.js-plastick.prototype._createeventlisteners" class="permalink">#</a> Plastick._createEventListeners(state)
-                            <small>private method</small>
+                            <a href="#plastick.js-plastick.prototype._createeventlisteners" class="permalink">#</a>
+                            <span class="method-name" title="Plastick._createEventListeners(state)">Plastick._createEventListeners(state)</span>
+                            <small class="scope-private">private method</small>
                         </h2>
 
-                        <p>Creates event listeners registered to a game state.</p>
+                        <div class="description lead">
+
+                            <p>Creates event listeners registered to a game state.</p>
 
 
-                        
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>state</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The <code>Plastick.State</code> that is now current.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The <code>Plastick.State</code> that is now current.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1281,29 +1458,50 @@ console.log(game.height());</p>
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._destroyeventlisteners">
-                            <a href="#plastick.js-plastick.prototype._destroyeventlisteners" class="permalink">#</a> Plastick._destroyEventListeners(state)
-                            <small>private method</small>
+                            <a href="#plastick.js-plastick.prototype._destroyeventlisteners" class="permalink">#</a>
+                            <span class="method-name" title="Plastick._destroyEventListeners(state)">Plastick._destroyEventListeners(state)</span>
+                            <small class="scope-private">private method</small>
                         </h2>
 
-                        <p>Removes event listeners registered to a game state.</p>
+                        <div class="description lead">
+
+                            <p>Removes event listeners registered to a game state.</p>
 
 
-                        
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>state</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The <code>Plastick.State</code> that was popped from the state stack.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>state</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The <code>Plastick.State</code> that was popped from the state stack.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1331,33 +1529,39 @@ console.log(game.height());</p>
                     <div class="method scope-private">
 
                         <h2 id="plastick.js-plastick.prototype._gameloop">
-                            <a href="#plastick.js-plastick.prototype._gameloop" class="permalink">#</a> Plastick._gameLoop()
-                            <small>private method</small>
+                            <a href="#plastick.js-plastick.prototype._gameloop" class="permalink">#</a>
+                            <span class="method-name" title="Plastick._gameLoop()">Plastick._gameLoop()</span>
+                            <small class="scope-private">private method</small>
                         </h2>
 
-                        <p>The main game loop. The game is simulated using a fixed time step design. _update() is called once per canvas frame, but could simulate several game ticks in each call. The rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by requestAnimationFrame()). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of this.TICK_CHOKE ticks per call. Below is Plastick's implementation of this game loop:</p>
+                        <div class="description lead">
 
+                            <p>The main game loop. The game is simulated using a fixed time step design. <code>Plastick.State._update()</code> is called once per game tick, but several ticks could be simulated before the canvas is rendered with <code>Plastick.State._draw()</code>. Thus, the rate of the game tick simulation is decoupled from the canvas frame rate (which is governed by <code>requestAnimationFrame()</code>). If the simulation falls behind momentarily, it will try to catch up at a maximum rate of <code>Plastick.TICK_CHOKE</code> ticks per call. Below is Plastick's implementation of this game loop:</p>
+<pre><code><span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-                        <pre><code><span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-
-    <span class="hljs-keyword">var</span> ticksUpdated = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">var</span> ticksUpdated = <span class="hljs-number">0</span>,
+        sameState = <span class="hljs-keyword">this</span>.currentState();
 
     <span class="hljs-keyword">this</span>._frameTime = <span class="hljs-keyword">this</span>.gameTime();
     <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._frameTime * <span class="hljs-keyword">this</span>.TARGET_TPS / <span class="hljs-number">1000</span> &gt; <span class="hljs-keyword">this</span>.currentTick &amp;&amp;
-            ticksUpdated &lt; <span class="hljs-keyword">this</span>.TICK_CHOKE) {
+            ticksUpdated &lt; <span class="hljs-keyword">this</span>.TICK_CHOKE &amp;&amp;
+            <span class="hljs-keyword">this</span>._isRunning) {
+
         <span class="hljs-keyword">this</span>.currentTick += <span class="hljs-number">1</span>;
         ticksUpdated += <span class="hljs-number">1</span>;
         <span class="hljs-keyword">this</span>.currentState()._update(<span class="hljs-keyword">this</span>);
         <span class="hljs-keyword">this</span>.tickTime = <span class="hljs-keyword">this</span>.gameTime();
     }
     <span class="hljs-comment">// skip draw if game was stopped (no state on the stack!)</span>
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._isRunning) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._isRunning &amp;&amp; <span class="hljs-keyword">this</span>.currentState() === sameState) {
         <span class="hljs-keyword">this</span>.tickAlpha = <span class="hljs-keyword">this</span>.gameTime() * <span class="hljs-keyword">this</span>.TARGET_TPS / <span class="hljs-number">1000</span> - <span class="hljs-keyword">this</span>.currentTick + <span class="hljs-number">1</span>;
         <span class="hljs-keyword">this</span>.currentState()._draw(<span class="hljs-keyword">this</span>);
     }
 };
 </code></pre>
 
+
+                        </div>
 
 
 
@@ -1383,31 +1587,52 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state">
-                            <a href="#plastick.js-plastick.state" class="permalink">#</a> Plastick.State([name])
+                            <a href="#plastick.js-plastick.state" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State([name])">Plastick.State([name])</span>
                         </h2>
 
-                        <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for the six definable methods is to do nothing. The user can redefine each one by passing it a callback method.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState = <span class="hljs-keyword">new</span> State();
+                            <p>This represents a game state (menu, pause screen, demo screen, etc). The default behavior for the six definable methods is to do nothing. The user can redefine each one by passing it a callback method.</p>
+<pre><code>menuState = <span class="hljs-keyword">new</span> State();
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>name</b>
-                                        <code>String</code>
-                                        <span class="label label-default">Optional</span>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>A label for the new state (useful when debugging).</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>name</td>
+                                        <td>
+                                            <code>String</code>
+                                        </td>
+                                        <td><p>A label for the new state (useful when debugging).</p>
+</td>
+                                        <td>
+                                                <span class="tag tag-default">Optional</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1417,24 +1642,43 @@ console.log(game.height());</p>
 
                             <h3>Properties</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>data</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>A generic object which the user can store any state-related data in.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>data</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>A generic object which the user can store any state-related data in.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>methods</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>A generic object which the user can store any state-related methods in.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
-
-                                <p>
-                                    <b>methods</b>
-                                        <code>Object</code>
-                                </p>
-
-                                <p>A generic object which the user can store any state-related methods in.</p>
-
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1463,48 +1707,71 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.registerlistener">
-                            <a href="#plastick.js-plastick.state.prototype.registerlistener" class="permalink">#</a> Plastick.State.registerListener(element, type, callback)
+                            <a href="#plastick.js-plastick.state.prototype.registerlistener" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.registerListener(element, type, callback)">Plastick.State.registerListener(element, type, callback)</span>
                         </h2>
 
-                        <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this is the current state, and removed from the page when this state is paused or finished.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.registerListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>This method allows the user to register an event listener with this state. All registered events are added to the page when this state is started or resumed, and they are removed from the page when this state is paused or finished.</p>
+<pre><code>menuState.registerListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>element</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The object to register the listener for.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>element</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The object to register the listener for.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>type</td>
+                                        <td>
+                                            <code>String</code>
+                                        </td>
+                                        <td><p>The event to register the listener for.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>callback</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The callback function to register.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
-
-                                <p>
-                                    <b>type</b>
-                                        <code>String</code>
-                                </p>
-
-                                <p>The event to register the listener for.</p>
-
-
-
-                                <p>
-                                    <b>callback</b>
-                                        <code>Function</code>
-                                </p>
-
-                                <p>The callback function to register.</p>
-
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1532,49 +1799,72 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.deregisterlistener">
-                            <a href="#plastick.js-plastick.state.prototype.deregisterlistener" class="permalink">#</a> Plastick.State.deregisterListener(element, type[, callback])
+                            <a href="#plastick.js-plastick.state.prototype.deregisterlistener" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.deregisterListener(element, type[, callback])">Plastick.State.deregisterListener(element, type[, callback])</span>
                         </h2>
 
-                        <p>This method allows the user to deregister an event listener with this state. If you want to deregister a specific callback, you <em>must</em> pass in a reference of the same copy that was registered eariler. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.deregisterListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>);
+                            <p>This method allows the user to deregister an event listener with this state. If you want to deregister a specific callback, you <em>must</em> pass in a reference of the same copy that was registered eariler. If the callback parameter is omitted, all callbacks linked to the specified element-event combination are deregistered.</p>
+<pre><code>menuState.deregisterListener(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>);
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>element</b>
-                                        <code>Object</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The object to deregister the listener(s) for.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>element</td>
+                                        <td>
+                                            <code>Object</code>
+                                        </td>
+                                        <td><p>The object to deregister the listener(s) for.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>type</td>
+                                        <td>
+                                            <code>String</code>
+                                        </td>
+                                        <td><p>The event to deregister the listener(s) for.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>callback</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The specific callback function to deregister.</p>
+</td>
+                                        <td>
+                                                <span class="tag tag-default">Optional</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
-
-                                <p>
-                                    <b>type</b>
-                                        <code>String</code>
-                                </p>
-
-                                <p>The event to deregister the listener(s) for.</p>
-
-
-
-                                <p>
-                                    <b>callback</b>
-                                        <code>Function</code>
-                                        <span class="label label-default">Optional</span>
-                                </p>
-
-                                <p>The specific callback function to deregister.</p>
-
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1602,30 +1892,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.init">
-                            <a href="#plastick.js-plastick.state.prototype.init" class="permalink">#</a> Plastick.State.init(func)
+                            <a href="#plastick.js-plastick.state.prototype.init" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.init(func)">Plastick.State.init(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.init(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>Registers a callback to the <code>init()</code> method. This method is called by Plastick whenever this state is added to the state stack.</p>
+<pre><code>menuState.init(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>init()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>init()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1655,30 +1966,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.cleanup">
-                            <a href="#plastick.js-plastick.state.prototype.cleanup" class="permalink">#</a> Plastick.State.cleanup(func)
+                            <a href="#plastick.js-plastick.state.prototype.cleanup" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.cleanup(func)">Plastick.State.cleanup(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.cleanup(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>Registers a callback to the <code>cleanup()</code> method. This method is called by Plastick whenever this state is removed from the state stack.</p>
+<pre><code>menuState.cleanup(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>cleanup()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>cleanup()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1708,30 +2040,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.update">
-                            <a href="#plastick.js-plastick.state.prototype.update" class="permalink">#</a> Plastick.State.update(func)
+                            <a href="#plastick.js-plastick.state.prototype.update" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.update(func)">Plastick.State.update(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.update(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>Registers a callback to the <code>update()</code> method. This method is called by Plastick once during each game tick. The passed callback should contain your main game loop, and as part of a fixed time step design it should always simulate a constant amount of game time. In order to maintain accurate timing in your game, Plastick may call this multiple times between each canvas frame.</p>
+<pre><code>menuState.update(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>update()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>update()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1761,13 +2114,14 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.draw">
-                            <a href="#plastick.js-plastick.state.prototype.draw" class="permalink">#</a> Plastick.State.draw(func)
+                            <a href="#plastick.js-plastick.state.prototype.draw" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.draw(func)">Plastick.State.draw(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call renderAnimationFrame(); this is done automatically by Plastick (or Facade if it was passed to Plastick upon construction).</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.draw(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+                            <p>Registers a callback to the <code>draw()</code> method. This method is called by Plastick once before each canvas frame is drawn. The passed callback should contain your rendering code. You do not need to call <code>requestAnimationFrame()</code>; this is done automatically by Plastick (or by Facade if it was passed to Plastick upon construction).</p>
+<pre><code>menuState.draw(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
     game.stage.clear();
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> e = <span class="hljs-number">0</span>; e &lt; entities.length; e += <span class="hljs-number">1</span>) {
     }
@@ -1775,20 +2129,40 @@ console.log(game.height());</p>
 </code></pre>
 
 
+                        </div>
+
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>draw()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>draw()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1818,30 +2192,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.pause">
-                            <a href="#plastick.js-plastick.state.prototype.pause" class="permalink">#</a> Plastick.State.pause(func)
+                            <a href="#plastick.js-plastick.state.prototype.pause" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.pause(func)">Plastick.State.pause(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.pause(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>Registers a callback to the <code>pause()</code> method. This method is called by Plastick when this state is the current state and is being suspended to begin simulation of a new state.</p>
+<pre><code>menuState.pause(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>pause()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>pause()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1871,30 +2266,51 @@ console.log(game.height());</p>
                     <div class="method scope-public">
 
                         <h2 id="plastick.js-plastick.state.prototype.resume">
-                            <a href="#plastick.js-plastick.state.prototype.resume" class="permalink">#</a> Plastick.State.resume(func)
+                            <a href="#plastick.js-plastick.state.prototype.resume" class="permalink">#</a>
+                            <span class="method-name" title="Plastick.State.resume(func)">Plastick.State.resume(func)</span>
                         </h2>
 
-                        <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
+                        <div class="description lead">
 
-
-                        <pre><code>menuState.resume(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
+                            <p>Registers a callback to the <code>resume()</code> method. This method is called by Plastick when this state is suspended and is resuming simulation as the current state.</p>
+<pre><code>menuState.resume(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{...});
 </code></pre>
 
+
+                        </div>
 
 
                         <section class="parameters">
 
                             <h3>Parameters</h3>
 
+                            <div class="table-responsive">
+                                <table class="table">
 
-                                <p>
-                                    <b>func</b>
-                                        <code>Function</code>
-                                </p>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
 
-                                <p>The function to use for the <code>resume()</code> callback.</p>
+                                    <tbody>
+                                    <tr>
+                                        <td>func</td>
+                                        <td>
+                                            <code>Function</code>
+                                        </td>
+                                        <td><p>The function to use for the <code>resume()</code> callback.</p>
+</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
 
-
+                                </table>
+                            </div>
 
                         </section>
 
@@ -1939,6 +2355,67 @@ console.log(game.height());</p>
     </div>
 
 </footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+<script>
+
+(function () {
+
+    'use strict';
+
+    var headerHeight = $('.jumbotron').outerHeight(true),
+        $backToTop = $('.back-to-top');
+
+    function handleScrollEvent() {
+
+        if (window.scrollY > headerHeight && $backToTop.not('.visible')) {
+
+            $backToTop.addClass('visible');
+
+        } else if (window.scrollY < headerHeight && $backToTop.is('.visible')) {
+
+            $backToTop.removeClass('visible');
+
+        }
+
+    }
+
+    $('pre code:not(.hljs)').each(function () {
+        hljs.highlightBlock(this);
+    });
+
+    var $methodLinks = $('.method-link');
+
+    $('#search-methods').on('keyup', function (e) {
+
+        var query = new RegExp(e.target.value.replace(' ', '|'), 'ig');
+
+        $methodLinks.each(function () {
+
+            var $this = $(this);
+
+            if (!$this.text().match(query)) {
+
+                $this.hide();
+
+            } else {
+
+                $this.show();
+
+            }
+
+        });
+
+    });
+
+    $(window).on('scroll', handleScrollEvent);
+
+    handleScrollEvent();
+
+})();
+
+</script>
 
 </body>
 </html>
